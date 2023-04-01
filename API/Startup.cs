@@ -58,10 +58,6 @@ public class Startup
         }
         else // production
         {
-            var root = Directory.GetCurrentDirectory();
-            var dotenv = Path.Combine(root, "stack.env");
-            Console.Out.WriteLine("Using env file: "+dotenv.ToString());
-            DotEnv.Load(dotenv);
         }
 
         app.UseRouting();
