@@ -1,8 +1,0 @@
-version: "3.3"
-services:
-  dotnet-template-test:
-    container_name: dotnet-template-test
-    volumes:
-      - ./TestResults:/src/UnitTests/TestResults
-    build:
-      context: .

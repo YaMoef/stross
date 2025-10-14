@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+      <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.72.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Stross.Config\Stross.Config.csproj" />
+      <ProjectReference Include="..\Stross.Domain\Stross.Domain.csproj" />
+      <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="EntityTypeConfigurations\" />
+      <Folder Include="Migrations" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="..\Stross.Proto\YtDownload.proto">
+        <GrpcServices>Client</GrpcServices>
+        <Access>Public</Access>
+        <ProtoCompile>True</ProtoCompile>
+        <CompileOutputs>True</CompileOutputs>
+        <OutputDir>obj\Debug/net7.0/</OutputDir>
+        <Generator>MSBuild:Compile</Generator>
+        <Link>Proto\YtDownload.proto</Link>
+      </Protobuf>
+    </ItemGroup>
+
+</Project>

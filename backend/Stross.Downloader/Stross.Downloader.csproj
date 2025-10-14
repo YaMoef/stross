@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+      <PackageReference Include="Grpc.AspNetCore.Web" Version="2.71.0" />
+      <PackageReference Include="Grpc.Core" Version="2.46.6" />
+      <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+      <PackageReference Include="NYoutubeDLP" Version="0.13.2" />
+      <ProjectReference Include="..\Stross.Config\Stross.Config.csproj" />
+      <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Grpc.Net.Client.Web">
+        <HintPath>..\..\..\..\..\.nuget\packages\grpc.net.client.web\2.57.0\lib\net7.0\Grpc.Net.Client.Web.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="..\Stross.Proto\YtDownload.proto">
+        <GrpcServices>Server</GrpcServices>
+        <Access>Public</Access>
+        <ProtoCompile>True</ProtoCompile>
+        <CompileOutputs>True</CompileOutputs>
+        <OutputDir>obj\Debug/net7.0/</OutputDir>
+        <Generator>MSBuild:Compile</Generator>
+        <Link>Proto\YtDownload.proto</Link>
+      </Protobuf>
+    </ItemGroup>
+</Project>

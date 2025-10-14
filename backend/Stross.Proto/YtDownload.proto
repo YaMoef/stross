@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "Proto";
+
+service YTDownloader {
+  rpc Download (YtDownloadRequest) returns (YtDownloadReply);
+}
+
+message YtDownloadRequest {
+  string url = 1;
+}
+
+message YtDownloadReply {
+  bool succeeded = 1;
+  string error=2;
+}
