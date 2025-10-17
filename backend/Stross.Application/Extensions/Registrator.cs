@@ -11,10 +11,10 @@ public static class Registrator
     public static IServiceCollection RegisterApplication(this IServiceCollection services)
     {
         services.RegisterServices();
-        services.AddMediatR(config =>
-        {
-            
-        });
+        // services.AddMediatR(config =>
+        // {
+        //
+        // });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

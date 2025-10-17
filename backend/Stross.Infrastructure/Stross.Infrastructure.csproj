@@ -35,16 +35,4 @@
       <Folder Include="Migrations" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Protobuf Include="..\Stross.Proto\YtDownload.proto">
-        <GrpcServices>Client</GrpcServices>
-        <Access>Public</Access>
-        <ProtoCompile>True</ProtoCompile>
-        <CompileOutputs>True</CompileOutputs>
-        <OutputDir>obj\Debug/net7.0/</OutputDir>
-        <Generator>MSBuild:Compile</Generator>
-        <Link>Proto\YtDownload.proto</Link>
-      </Protobuf>
-    </ItemGroup>
-
 </Project>

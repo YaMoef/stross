@@ -1,4 +1,4 @@
-namespace Stross.Downloader.Exceptions;
+namespace Stross.Downloader.YT.Exceptions;
 
 public class YtDlpException: Exception
 {

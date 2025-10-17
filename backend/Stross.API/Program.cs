@@ -1,12 +1,16 @@
-using System.Text.Json.Serialization;
 using Stross.Application.Extensions;
 using Stross.Infrastructure.Extensions;
-using Microsoft.OpenApi.Models;
-using Stross.Config;
+using Scalar.AspNetCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.RegisterApplication();
+builder.Services.RegisterInfrastructure();
+
+// Add OpenAPI services
+builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
 {
@@ -20,7 +24,7 @@ builder.Services.AddCors(options =>
             policy.AllowAnyHeader();
         });
 });
-        
+
 builder.Services.AddAuthorization();
 
 WebApplication app = builder.Build();
@@ -28,6 +32,18 @@ WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment()) // development
 {
     app.UseDeveloperExceptionPage();
+
+    // Map OpenAPI endpoint
+    app.MapOpenApi();
+
+    // Add Scalar API documentation
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "Stross API";
+        options.Theme = ScalarTheme.Purple;
+        options.ShowSidebar = true;
+        options.DarkMode = true;
+    });
 }
 else // production
 {
@@ -40,8 +56,6 @@ app.UseAuthentication();
        
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
+
 app.Run();

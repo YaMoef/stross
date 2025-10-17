@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stross.Infrastructure", "St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stross.Config", "Stross.Config\Stross.Config.csproj", "{B6B2BD9F-7FFF-4826-BFF5-FA3966315112}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stross.Downloader", "Stross.Downloader\Stross.Downloader.csproj", "{325CD161-B4B1-4BE9-BD28-1B0236989D4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stross.Downloader.YT", "Stross.Downloader.YT\Stross.Downloader.YT.csproj", "{325CD161-B4B1-4BE9-BD28-1B0236989D4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stross.Proto", "Stross.Proto\Stross.Proto.csproj", "{4E16E568-74ED-4A06-BAB8-4E825CE018D9}"
 EndProject

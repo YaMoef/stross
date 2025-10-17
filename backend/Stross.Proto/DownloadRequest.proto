@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "Stross.Proto";
+
+service Downloader {
+  rpc Download (DownloadRequest) returns (DownloadReply);
+}
+
+message DownloadRequest {
+  string sourceUrl = 1;
+  string targetLocationPath = 2;
+}
+
+message DownloadReply {
+  bool succeeded = 1;
+  string error = 2;
+}

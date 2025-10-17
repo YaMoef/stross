@@ -2,5 +2,5 @@
 
 public class ConnectionStringConfig
 {
-    public string Database { get; set; }
+    public required string Database { get; set; }
 }

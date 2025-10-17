@@ -1,24 +1,20 @@
 using Grpc.Net.Client;
-using Grpc.Net.Client.Web;
-using Proto;
+using Stross.Proto;
 
 namespace Stross.Infrastructure.Services.GrpcService;
 
 public class GrpcService : IGrpcService
 {
-    public async Task<bool> SendDownloadYtAudio(string url)
+    public async Task<bool> SendDownloadYtAudioAsync(string url, CancellationToken cancellationToken = default)
     {
-        AppContext.SetSwitch(
-            "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-        var channel = GrpcChannel.ForAddress("http://localhost:5000", new GrpcChannelOptions
-        {
-            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
-        });
-        
-        //using var channel = GrpcChannel.ForAddress("http://localhost:5000").
-        var client = new YTDownloader.YTDownloaderClient(channel);
-        var reply = await client.DownloadAsync(new YtDownloadRequest{Url = url});
-        Console.Out.WriteLine("File download succceeded: "+reply.Succeeded);
+        // Enable HTTP/2 over unencrypted connections for gRPC
+        string targetPath = Guid.NewGuid().ToString();
+
+        using GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:5288");
+        Downloader.DownloaderClient client = new Downloader.DownloaderClient(channel);
+        DownloadReply reply = await client.DownloadAsync(new DownloadRequest
+            { SourceUrl = url, TargetLocationPath = targetPath }, cancellationToken: cancellationToken);
+
         return reply.Succeeded;
     }
 }
