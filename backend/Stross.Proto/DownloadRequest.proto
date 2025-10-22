@@ -3,15 +3,35 @@ syntax = "proto3";
 option csharp_namespace = "Stross.Proto";
 
 service Downloader {
-  rpc Download (DownloadRequest) returns (DownloadReply);
+  rpc DownloadMusicTrack (DownloadMusicTrackRequest) returns (DownloadMusicTrackReply);
+  rpc GetCreatorMetadata (GetCreatorMetadataRequest) returns (GetCreatorMetadataReply);
 }
 
-message DownloadRequest {
+message DownloadMusicTrackRequest {
   string sourceUrl = 1;
-  string targetLocationPath = 2;
+  string targetLocationPath = 3;
 }
 
-message DownloadReply {
+message DownloadMusicTrackReply {
   bool succeeded = 1;
   string error = 2;
+
+  string sourceUrl = 3;
+  string title = 4;
+  repeated string creatorIds = 5;
+  string TargetLocationPath = 6;
+}
+
+message GetCreatorMetadataRequest {
+  string creatorId = 1;
+}
+
+message GetCreatorMetadataReply {
+  bool succeeded = 1;
+  string error = 2;
+
+  string creatorId = 3;
+  string creatorName = 4;
+  string creatorUrl = 5;
+  string creatorThumbnailImageUrl = 6;
 }

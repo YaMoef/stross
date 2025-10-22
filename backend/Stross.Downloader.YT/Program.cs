@@ -1,6 +1,8 @@
 ﻿
+using System.Net;
 using Stross.Downloader.YT.Services;
 using Stross.Downloader.YT.Configuration;
+using Stross.Downloader.YT.Constants;
 using Stross.Downloader.YT.Downloaders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,25 @@ builder.Logging.AddConsole();
 builder.Services.AddOptions<DownloaderConfig>().BindConfiguration(DownloaderConfig.SectionName);
 
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(Clients.YoutubeChannelIdClient, client =>
+    {
+        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+        client.DefaultRequestHeaders.Add("Accept-Language", "en");
+    })
+    .ConfigurePrimaryHttpMessageHandler(() =>
+    {
+        var cookies = new CookieContainer();
+        cookies.Add(new Cookie("CONSENT", "YES+1", "/", ".youtube.com"));
+        cookies.Add(new Cookie("SOCS", "CAE", "/", ".youtube.com"));
+
+        return new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            UseCookies = true,
+            CookieContainer = cookies,
+            AllowAutoRedirect = true
+        };
+    });
 
 // Add services to the container.
 builder.Services.AddGrpc();

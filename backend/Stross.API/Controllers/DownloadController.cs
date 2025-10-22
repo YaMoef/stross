@@ -26,7 +26,7 @@ public class DownloadController: ApiV1Controller
     [HttpPost("youtube-audio")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddTemplate([FromBody] string url)
+    public async Task<IActionResult> DownloadYoutubeMusicTrack([FromBody] string url)
     {
         if (string.IsNullOrWhiteSpace(url))
         {
@@ -34,6 +34,21 @@ public class DownloadController: ApiV1Controller
         }
 
         object result = await _grpcService.SendDownloadYtAudioAsync(url);
+
+        return Ok(result);
+    }
+
+    [HttpGet("youtube-channel/{channelId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetChannelMetadata(string channelId)
+    {
+        if (string.IsNullOrWhiteSpace(channelId))
+        {
+            return BadRequest("ChannelId cannot be empty");
+        }
+
+        object result = await _grpcService.GetCreatorMetadataAsync(channelId);
 
         return Ok(result);
     }
