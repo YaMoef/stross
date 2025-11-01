@@ -3,6 +3,7 @@ using Scalar.AspNetCore;
 using Stross.API.Endpoints;
 using Stross.Application;
 using Stross.Application.Slices.MusicTrack;
+using Stross.Application.Slices.Provider;
 using Stross.Config;
 using Stross.Infrastructure;
 
@@ -46,6 +47,7 @@ builder.Services.AddProblemDetails(opts =>
 });
 
 builder.AddMusicTrackSlice();
+builder.AddProviderSlice();
 
 WebApplication app = builder.Build();
 
@@ -98,6 +100,7 @@ app.UseAuthorization();
 
 app
     .MapGroup("v1")
-    .MapMusicTrackEndpoints();
+    .MapMusicTrackEndpoints()
+    .MapProviderEndpoints();
 
 app.Run();
