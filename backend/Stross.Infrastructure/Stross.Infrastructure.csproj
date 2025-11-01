@@ -7,32 +7,34 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-      <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
-      <PackageReference Include="Grpc.Tools" Version="2.72.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.71.0"/>
+        <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0"/>
+        <PackageReference Include="Grpc.Tools" Version="2.72.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.10"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Stross.Config\Stross.Config.csproj" />
-      <ProjectReference Include="..\Stross.Domain\Stross.Domain.csproj" />
-      <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj" />
+        <ProjectReference Include="..\Stross.Config\Stross.Config.csproj"/>
+        <ProjectReference Include="..\Stross.Domain\Stross.Domain.csproj"/>
+        <ProjectReference Include="..\Stross.Exception\Stross.Exception.csproj"/>
+        <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="EntityTypeConfigurations\" />
-      <Folder Include="Migrations" />
+        <Folder Include="EntityTypeConfigurations\"/>
+        <Folder Include="Migrations"/>
     </ItemGroup>
-
 </Project>
