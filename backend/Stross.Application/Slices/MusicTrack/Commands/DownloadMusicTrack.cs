@@ -1,8 +1,8 @@
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Stross.Application.Slices.MusicTrack.InputModels;
-using Stross.Application.Slices.MusicTrack.ResponseModels;
 using Stross.Config;
 using Stross.Domain.Entities;
 using Stross.Exception.Exceptions;
@@ -14,6 +14,17 @@ using Stross.Infrastructure.Services.ThumbnailService;
 namespace Stross.Application.Slices.MusicTrack.Commands;
 
 public sealed record DownloadMusicTrackCommand(DownloadMusicTrackInput Input) : IRequest<long>;
+
+internal sealed class DownloadMusicTrackCommandValidator : AbstractValidator<DownloadMusicTrackCommand>
+{
+    public DownloadMusicTrackCommandValidator(IValidator<DownloadMusicTrackInput> inputValidator)
+    {
+        RuleFor(x => x.Input)
+            .NotNull()
+            .WithMessage("Input is required")
+            .SetValidator(inputValidator);
+    }
+}
 
 internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<DownloadMusicTrackCommand, long>
 {
