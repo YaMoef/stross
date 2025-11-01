@@ -73,4 +73,12 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
             return new GetCreatorMetadataReply { Error = ex.Message, Succeeded = false };
         }
     }
+
+    public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
+    {
+        return Task.FromResult(new PingReply()
+        {
+            Ready = true
+        });
+    }
 }
