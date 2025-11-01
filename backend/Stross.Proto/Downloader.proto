@@ -5,6 +5,7 @@ option csharp_namespace = "Stross.Proto";
 service Downloader {
   rpc DownloadMusicTrack (DownloadMusicTrackRequest) returns (DownloadMusicTrackReply);
   rpc GetCreatorMetadata (GetCreatorMetadataRequest) returns (GetCreatorMetadataReply);
+  rpc Ping (PingRequest) returns (PingReply);
 }
 
 message DownloadMusicTrackRequest {
@@ -36,4 +37,12 @@ message GetCreatorMetadataReply {
   string creatorName = 4;
   string creatorUrl = 5;
   string creatorThumbnailImageUrl = 6;
+}
+
+message PingRequest {
+  
+}
+
+message PingReply {
+  bool ready = 1;
 }
