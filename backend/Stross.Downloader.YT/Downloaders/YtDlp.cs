@@ -32,14 +32,12 @@ public class YtDlp
         CancellationToken cancellationToken = default)
     {
         Uri parsedUri = new Uri(sourceUrl);
-        string startPath = Path.Combine(_config.OutputPath, targetLocationPath);
+        string startPath = Path.Combine(_config.OutputPath, "musicTracks", targetLocationPath);
         string outputPathAudio = Path.Combine(startPath, $"1.{_config.AudioFormat}");
         string outputPathThumbnail = Path.Combine(startPath, "2.jpg");
 
         if (!Path.Exists(startPath))
-        {
             Directory.CreateDirectory(startPath);
-        }
 
         NameValueCollection parsed =
             HttpUtility.ParseQueryString(parsedUri.Query.Split('?').Skip(1).FirstOrDefault() ?? "");
@@ -66,9 +64,7 @@ public class YtDlp
 
         // Set audio format based on configuration
         if (Enum.TryParse<Enums.AudioFormat>(_config.AudioFormat, true, out Enums.AudioFormat audioFormat))
-        {
             _youtubeDlp.Options.PostProcessingOptions.AudioFormat = audioFormat;
-        }
 
         await _youtubeDlp.DownloadAsync();
 
@@ -82,7 +78,8 @@ public class YtDlp
 
         _logger.LogDebug("Download completed successfully for URL: {SourceUrl}", sourceUrl);
 
-        return new MusicTrackMetadata(sourceUrl, videoMetadata.Title, [channelId], startPath);
+        return new MusicTrackMetadata(sourceUrl, videoMetadata.Title, [channelId], outputPathAudio,
+            outputPathThumbnail);
     }
 
     public async Task<CreatorMetadata> GetCreatorMetadataAsync(string creatorId,
@@ -101,12 +98,12 @@ public class YtDlp
 
         using HttpClient authorNameClient = _httpClientFactory.CreateClient();
 
-        var xml = await authorNameClient.GetStringAsync(rssFeedUrl, cancellationToken);
+        string xml = await authorNameClient.GetStringAsync(rssFeedUrl, cancellationToken);
 
         XNamespace atom = "http://www.w3.org/2005/Atom";
-        var doc = XDocument.Parse(xml);
+        XDocument doc = XDocument.Parse(xml);
 
-        var channelTitle = doc.Root?.Element(atom + "title")?.Value;
+        string? channelTitle = doc.Root?.Element(atom + "title")?.Value;
 
         return channelTitle;
     }
@@ -123,14 +120,12 @@ public class YtDlp
 
         using HttpClient youtubeChannelIdHttpClient = _httpClientFactory.CreateClient(Clients.YoutubeChannelIdClient);
 
-        var html = await youtubeChannelIdHttpClient.GetStringAsync(url, cancellationToken);
+        string html = await youtubeChannelIdHttpClient.GetStringAsync(url, cancellationToken);
 
-        var match = Regex.Match(html,
+        Match match = Regex.Match(html,
             @"https://yt3\.googleusercontent\.com/[A-Za-z0-9\-_]+=s\d+-c-k-c0x00ffffff-no-rj");
         if (match.Success)
-        {
             return match.Value;
-        }
 
         throw new YtDlpException("Failed to get channel thumbnail URL");
     }
@@ -197,14 +192,13 @@ public class YtDlp
             string htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
             // Use regex to find the channel URL pattern
-            var match = Regex.Match(htmlContent, @"https://www\.youtube\.com/channel/(UC[0-9A-Za-z_-]{22})");
+            Match match = Regex.Match(htmlContent, @"https://www\.youtube\.com/channel/(UC[0-9A-Za-z_-]{22})");
+
             if (!match.Success)
                 match = Regex.Match(htmlContent, @"""channelId"":\s*""(UC[0-9A-Za-z_-]{22})""");
 
             if (match.Success)
-            {
                 return match.Groups[1].Value; // Return just the channel ID part
-            }
 
             throw new YtDlpException($"Channel ID not found in the response from URL: {authorUrl}");
         }

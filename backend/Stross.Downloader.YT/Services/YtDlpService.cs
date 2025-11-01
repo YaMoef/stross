@@ -25,16 +25,17 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
             MusicTrackMetadata outputData =
                 await _downloader.DownloadMusicTrack(request.SourceUrl, request.TargetLocationPath);
 
-            DownloadMusicTrackReply reply = new()
+            DownloadMusicTrackReply reply = new DownloadMusicTrackReply
             {
                 Error = "",
                 Succeeded = true,
 
                 Title = outputData.Title,
                 SourceUrl = outputData.SourceUrl,
-                TargetLocationPath = outputData.TargetLocationPath
+                MusicTrackPath = outputData.MusicTrackPath,
+                ThumbnailPath = outputData.ThumbnailPath
             };
-            
+
             reply.CreatorIds.AddRange(outputData.CreatorIds);
 
             return reply;

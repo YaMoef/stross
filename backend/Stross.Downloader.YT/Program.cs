@@ -1,14 +1,13 @@
-﻿
-using System.Net;
+﻿using System.Net;
 using Stross.Downloader.YT.Services;
 using Stross.Downloader.YT.Configuration;
 using Stross.Downloader.YT.Constants;
 using Stross.Downloader.YT.Downloaders;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Configure logging
-builder.Logging.ClearProviders();  
+builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 // Bind configuration
@@ -22,7 +21,7 @@ builder.Services.AddHttpClient(Clients.YoutubeChannelIdClient, client =>
     })
     .ConfigurePrimaryHttpMessageHandler(() =>
     {
-        var cookies = new CookieContainer();
+        CookieContainer cookies = new CookieContainer();
         cookies.Add(new Cookie("CONSENT", "YES+1", "/", ".youtube.com"));
         cookies.Add(new Cookie("SOCS", "CAE", "/", ".youtube.com"));
 
@@ -39,11 +38,10 @@ builder.Services.AddHttpClient(Clients.YoutubeChannelIdClient, client =>
 builder.Services.AddGrpc();
 builder.Services.AddScoped<YtDlp>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<YtDlpService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
-

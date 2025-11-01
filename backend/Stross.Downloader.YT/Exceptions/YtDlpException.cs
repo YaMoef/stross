@@ -1,9 +1,9 @@
 namespace Stross.Downloader.YT.Exceptions;
 
-public class YtDlpException: Exception
+public class YtDlpException : Exception
 {
-    public YtDlpException(string? message): base(message)
+    public YtDlpException(string? message) : base(message)
     {
-        
+
     }
 }
