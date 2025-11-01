@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace Stross.Application.Behaviours;
@@ -17,14 +18,14 @@ where TRequest: IRequest<TResponse>
     {
         if (_validators.Any())
         {
-            var context = new FluentValidation.ValidationContext<TRequest>(request);
-            var validationResults =
+            ValidationContext<TRequest> context = new ValidationContext<TRequest>(request);
+            ValidationResult[] validationResults =
                 await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-            var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
+            List<ValidationFailure> failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
             if (failures.Count != 0)
                 throw new ValidationException(failures);
         }
 
-        return await next();
+        return await next(cancellationToken);
     }
 }
