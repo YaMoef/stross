@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.MusicTrack.InputModels;
 using Stross.Config;
 using Stross.Domain.Entities;
@@ -10,6 +11,7 @@ using Stross.Infrastructure;
 using Stross.Infrastructure.Services.GrpcService;
 using Stross.Infrastructure.Services.GrpcService.Models;
 using Stross.Infrastructure.Services.ThumbnailService;
+using ValidationException = Stross.Exception.Exceptions.ValidationException;
 
 namespace Stross.Application.Slices.MusicTrack.Commands;
 
@@ -43,8 +45,9 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
 
     public async Task<long> Handle(DownloadMusicTrackCommand request, CancellationToken cancellationToken)
     {
-        // TODO: sanitize the input url
-        Domain.Entities.MusicTrack? musicTrackInDb = await _context.MusicTracks.FirstOrDefaultAsync(m => m.ExternalUrl == request.Input.SourceUrl, cancellationToken);
+        string sanitizedUrl = request.Input.SourceUrl.SanitizeString() ?? throw new ValidationException(nameof(request.Input.SourceUrl), "Source URL is required.");
+
+        Domain.Entities.MusicTrack? musicTrackInDb = await _context.MusicTracks.FirstOrDefaultAsync(m => m.ExternalUrl.ToLower() == sanitizedUrl.ToLower(), cancellationToken);
 
         if (musicTrackInDb is not null)
             throw new StrossException("This music track has already been downloaded.");
@@ -59,7 +62,7 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
             throw new ProviderException("This provider is not enabled.");
 
         DownloadedMusicTrack downloadedMusicTrack =
-            await _grpcService.DownloadMusicTrackAsync(request.Input.SourceUrl, providerToUse, cancellationToken);
+            await _grpcService.DownloadMusicTrackAsync(sanitizedUrl, providerToUse, cancellationToken);
 
         List<Creator> creatorsInDb = await _context.Creators
             .Where(c => c.ExternalCreatorMusicTrack.Any(ec => downloadedMusicTrack.CreatorIds.Contains(ec.ExternalId)))
