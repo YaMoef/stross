@@ -6,29 +6,35 @@ namespace Stross.Infrastructure.EntityTypeConfigurations;
 
 public class MusicTrackConfiguration : BaseEntityConfiguration<MusicTrack>
 {
+    public static readonly int AudioFileLocationMaxLength = 2048;
+    public static readonly int OriginalNameMaxLength = 500;
+    public static readonly int FriendlyNameMaxLength = 500;
+    public static readonly int ThumbnailLocationMaxLength = 2048;
+    public static readonly int ExternalUrlMaxLength = 2048;
+
     protected override void ConfigureEntity(EntityTypeBuilder<MusicTrack> builder)
     {
         builder.ToTable("MusicTracks");
 
         builder.Property(x => x.AudioFileLocation)
             .IsRequired()
-            .HasMaxLength(2048);
+            .HasMaxLength(AudioFileLocationMaxLength);
 
         builder.Property(x => x.OriginalName)
             .IsRequired()
-            .HasMaxLength(500);
+            .HasMaxLength(OriginalNameMaxLength);
 
         builder.Property(x => x.FriendlyName)
             .IsRequired()
-            .HasMaxLength(500);
+            .HasMaxLength(FriendlyNameMaxLength);
 
         builder.Property(x => x.ThumbnailLocation)
             .IsRequired()
-            .HasMaxLength(2048);
+            .HasMaxLength(ThumbnailLocationMaxLength);
 
         builder.Property(x => x.ExternalUrl)
             .IsRequired()
-            .HasMaxLength(2048);
+            .HasMaxLength(ExternalUrlMaxLength);
 
         // Foreign key relationship with Provider
         builder.HasOne(x => x.Provider)
