@@ -9,7 +9,7 @@ service Downloader {
 
 message DownloadMusicTrackRequest {
   string sourceUrl = 1;
-  string targetLocationPath = 3;
+  string targetLocationPath = 2;
 }
 
 message DownloadMusicTrackReply {
@@ -19,7 +19,9 @@ message DownloadMusicTrackReply {
   string sourceUrl = 3;
   string title = 4;
   repeated string creatorIds = 5;
-  string TargetLocationPath = 6;
+  string musicTrackPath = 6;
+  string thumbnailPath = 7;
+  string musicTrackUrl = 8;
 }
 
 message GetCreatorMetadataRequest {
