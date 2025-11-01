@@ -22,8 +22,11 @@ where TRequest: IRequest<TResponse>
             ValidationResult[] validationResults =
                 await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
             List<ValidationFailure> failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
+
             if (failures.Count != 0)
-                throw new ValidationException(failures);
+                throw new Stross.Exception.Exceptions.ValidationException(
+                    failures.ToDictionary(f => f.PropertyName, f => f.ErrorMessage)
+                );
         }
 
         return await next(cancellationToken);
