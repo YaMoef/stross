@@ -1,31 +1,51 @@
-using Stross.Application.Extensions;
-using Stross.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Stross.API.Endpoints;
+using Stross.Application;
+using Stross.Application.Slices.MusicTrack;
+using Stross.Config;
+using Stross.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.RegisterApplication();
-builder.Services.RegisterInfrastructure();
+builder.AddInfrastructure();
+builder.AddApplication();
+
+builder.Services.AddOptions<DatabaseConfig>().BindConfiguration(DatabaseConfig.SectionName);
+builder.Services.AddOptions<StrossStorageConfig>().BindConfiguration(StrossStorageConfig.SectionName);
 
 // Add OpenAPI services
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000");
-            policy.AllowCredentials();
-            policy.AllowAnyMethod();
-            policy.WithHeaders("Authorization");
-            policy.AllowAnyHeader();
-        });
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000");
+        policy.AllowCredentials();
+        policy.AllowAnyMethod();
+        policy.WithHeaders("Authorization");
+        policy.AllowAnyHeader();
+    });
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddProblemDetails(opts =>
+{
+    opts.CustomizeProblemDetails = ctx =>
+    {
+        // Helps to correlate logs and errors with the specific request.
+        ctx.ProblemDetails.Extensions.Add("request-id", ctx.HttpContext.TraceIdentifier);
+
+        ctx.ProblemDetails.Extensions.Add("correlation-id", ctx.HttpContext.Request.Headers["X-Correlation-ID"]);
+        ctx.ProblemDetails.Extensions.Add("timestamp", DateTime.UtcNow);
+    };
+});
+
+builder.AddMusicTrackSlice();
 
 WebApplication app = builder.Build();
 
@@ -76,5 +96,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app
+    .MapGroup("v1")
+    .MapMusicTrackEndpoints();
 
 app.Run();
