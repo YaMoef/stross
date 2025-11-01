@@ -4,11 +4,11 @@ using Stross.Application.Slices.MusicTrack.InputModels;
 
 namespace Stross.API.Endpoints;
 
-public static class MusicTrackEndpoints
+internal static class MusicTrackEndpoints
 {
-    public static IEndpointRouteBuilder MapMusicTrackEndpoints(this IEndpointRouteBuilder endpoints)
+    internal static IEndpointRouteBuilder MapMusicTrackEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGroup("/music-track")
+        endpoints.MapGroup("/music-tracks")
             .MapPost("download",
                 async (DownloadMusicTrackInput input, IMediator sender, CancellationToken cancellationToken) =>
                 {

@@ -38,11 +38,11 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
         if (musicTrackInDb is not null)
             throw new StrossException("This music track has already been downloaded.");
 
-        Provider? providerToUse =
+        Domain.Entities.Provider? providerToUse =
             await _context.Providers.FirstOrDefaultAsync(p => p.Id == request.Input.ProviderId, cancellationToken);
 
         if (providerToUse is null)
-            throw new EntityNotFound(nameof(Provider));
+            throw new EntityNotFoundException(nameof(Provider));
 
         if (!providerToUse.Enabled)
             throw new ProviderException("This provider is not enabled.");
