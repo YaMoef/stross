@@ -49,11 +49,31 @@ else // production
 {
 }
 
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    StrossContext dbContext = scope.ServiceProvider.GetRequiredService<StrossContext>();
+    ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    // Check and apply pending migrations
+    IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+
+    if (pendingMigrations.Any())
+    {
+        logger.LogInformation("Applying pending migrations...");
+        await dbContext.Database.MigrateAsync();
+        logger.LogInformation("Migrations applied successfully.");
+    }
+    else
+    {
+        logger.LogInformation("No pending migrations found.");
+    }
+}
+
 app.UseRouting();
-        
+
 app.UseCors();
 app.UseAuthentication();
-       
+
 app.UseAuthorization();
 
 app.MapControllers();
