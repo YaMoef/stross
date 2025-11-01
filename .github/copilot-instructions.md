@@ -1,7 +1,7 @@
 # Copilot Instructions for Stross Backend Development
 
 ## Project Overview
-This is a .NET backend application built with Clean Architecture principles, using gRPC for communication, MediatR for CQRS pattern implementation, and Domain-Driven Design (DDD) principles.
+This is a .NET backend application built with Clean Architecture principles, using gRPC for communication, MediatR for CQRS pattern implementation, vertical sliced, minimal api based, and Domain-Driven Design (DDD) principles.
 
 ## Architecture Guidelines
 
@@ -12,7 +12,8 @@ This is a .NET backend application built with Clean Architecture principles, usi
 - **Stross.API**: gRPC services and API controllers
 - **Stross.Proto**: Protocol buffer definitions for gRPC
 - **Stross.Config**: Configuration models and settings
-- **Stross.Downloader**: Specialized service for download operations
+- **Stross.Downloader.YT**: Specialized YouTube service for download operations and fetching metadata
+- **Stross.Exception**: Contains all the exceptions that the application can throw
 
 ### Clean Code Principles
 1. **Single Responsibility Principle**: Each class should have one reason to change
@@ -23,7 +24,36 @@ This is a .NET backend application built with Clean Architecture principles, usi
 6. **No Magic Numbers**: Use constants or configuration for literal values
 7. **Whitespace Before Returns**: Always add a blank line before return statements when there is code above (applies to all code blocks, usings, if statements, foreach, do-while, etc.)
 8. **Explicit Type Declarations**: Never use the `var` keyword - always use explicit type declarations for clarity
-9. **Separate Request/Response Models**: Divide DTOs into separate Request and Response models instead of using generic DTOs
+9. **Separate Input/Response Models**: Divide DTOs into separate Input and Response models instead of using generic DTOs
+
+#### Vertical Slicing Guidelines
+- Organize code by feature rather than by layer
+- Each featur has it's own folder in the `Slices` folder in the application layer
+- Each feature folder contains its own commands, queries, handlers, and DTOs
+- Each feature has it own composer which looks like:
+```csharp
+public static class ExampleComposer
+{
+    public static IHostApplicationBuilder AddExampleSlice(this IHostApplicationBuilder builder)
+    {
+        builder.Services.RegisterExampleSliceServices();
+
+        return builder;
+    }
+
+    private static IServiceCollection RegisterExampleSliceServices(this IServiceCollection services)
+    {
+
+        return services;
+    }
+}
+```
+
+### Minimal API Guidelines
+- Put all the endpoints of a single slice in a single file named `SliceNameEndpoints.cs`
+- Use extension methods to add endpoints to the `IEndpointRouteBuilder` which is called `SliceNameEndpoints`
+- Put minimal logic in the endpoints
+- Use groups to create logical groupings of endpoints
 
 ### Domain-Driven Design (DDD) Guidelines
 
@@ -182,44 +212,13 @@ public interface IOrderRepository
 ```
 
 ### Error Handling
-- Use Result pattern for operation outcomes
-- Implement global exception handling middleware
-- Create custom domain exceptions
-- Use gRPC status codes appropriately
-- Log errors with structured logging
-
-Example Result pattern:
-```csharp
-public class Result<T>
-{
-    public bool IsSuccess { get; }
-    public T Value { get; }
-    public string Error { get; }
-    
-    private Result(bool isSuccess, T value, string error)
-    {
-        IsSuccess = isSuccess;
-        Value = value;
-        Error = error;
-    }
-    
-    public static Result<T> Success(T value) => new(true, value, string.Empty);
-    public static Result<T> Failure(string error) => new(false, default!, error);
-}
-```
+- Throw errors provided by the Stross.Exception project
 
 ### Configuration Management
 - Use strongly-typed configuration classes
 - Implement configuration validation
 - Use the Options pattern
 - Store sensitive data in environment variables or key vaults
-
-### Testing Guidelines
-- Write unit tests for domain logic
-- Create integration tests for MediatR handlers
-- Use TestContainers for database integration tests
-- Mock external dependencies
-- Follow AAA pattern (Arrange, Act, Assert)
 
 ### Performance Considerations
 - Use async/await consistently
@@ -237,8 +236,7 @@ public class Result<T>
 ## File Naming Conventions
 - Commands: `CreateOrderCommand.cs`
 - Queries: `GetOrderQuery.cs`
-- Handlers: `CreateOrderCommandHandler.cs`
-- Request Models: `CreateOrderRequest.cs`
+- Input Models: `CreateOrderInput.cs`
 - Response Models: `CreateOrderResponse.cs`
 - Entities: `Order.cs`
 - Value Objects: `OrderId.cs`
