@@ -39,7 +39,7 @@ public class MusicTrackConfiguration : BaseEntityConfiguration<MusicTrack>
         // Foreign key relationship with Provider
         builder.HasOne(x => x.Provider)
             .WithMany()
-            .HasForeignKey(x => x.MusicTrackProviderId)
+            .HasForeignKey(x => x.ProviderId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Many-to-many relationship with Creator (configured in CreatorConfiguration)

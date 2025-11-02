@@ -15,7 +15,7 @@ public class ExternalCreatorMusicTrack : BaseEntity
     public long CreatorId { get; private set; }
 
     public Provider Provider { get; private set; }
-    public long MusicTrackProviderId { get; private set; }
+    public long ProviderId { get; private set; }
 
     private ExternalCreatorMusicTrack()
     {
@@ -32,7 +32,7 @@ public class ExternalCreatorMusicTrack : BaseEntity
         Creator = creator;
         CreatorId = creator.Id;
         Provider = provider;
-        MusicTrackProviderId = provider.Id;
+        ProviderId = provider.Id;
         ExternalId = externalId;
         ExternalName = externalName;
         ThumbnailLocation = thumbnailLocation;

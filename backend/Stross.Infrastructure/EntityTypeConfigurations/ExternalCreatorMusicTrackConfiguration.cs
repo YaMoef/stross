@@ -43,14 +43,14 @@ public class ExternalCreatorMusicTrackConfiguration : BaseEntityConfiguration<Ex
 
         builder.HasOne(x => x.Provider)
             .WithMany()
-            .HasForeignKey(x => x.MusicTrackProviderId)
+            .HasForeignKey(x => x.ProviderId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Composite unique index to prevent duplicate external creator entries per provider
         builder.HasIndex(x => new
             {
                 x.ExternalId,
-                x.MusicTrackProviderId
+                x.ProviderId
             })
             .IsUnique();
     }

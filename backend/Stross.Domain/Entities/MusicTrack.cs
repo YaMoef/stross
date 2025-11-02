@@ -11,7 +11,7 @@ public class MusicTrack : BaseEntity
     public string ExternalUrl { get; private set; }
 
     public Provider? Provider { get; private set; }
-    public long MusicTrackProviderId { get; private set; }
+    public long ProviderId { get; private set; }
 
     private readonly List<Creator> _creators = [];
     public IReadOnlyCollection<Creator> Creators => _creators;
@@ -30,7 +30,7 @@ public class MusicTrack : BaseEntity
         string externalUrl)
     {
         Provider = provider;
-        MusicTrackProviderId = provider.Id;
+        ProviderId = provider.Id;
         _creators.AddRange(creators);
 
         AudioFileLocation = audioFileLocation;
