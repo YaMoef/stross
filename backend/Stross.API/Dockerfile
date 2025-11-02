@@ -1,20 +1,30 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER $APP_UID
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["API/API.csproj", "API/"]
-RUN dotnet restore "API/API.csproj"
+COPY ["Stross.API/Stross.API.csproj", "Stross.API/"]
+COPY ["Stross.Application/Stross.Application.csproj", "Stross.Application/"]
+COPY ["Stross.Domain/Stross.Domain.csproj", "Stross.Domain/"]
+COPY ["Stross.Exception/Stross.Exception.csproj", "Stross.Exception/"]
+COPY ["Stross.Infrastructure/Stross.Infrastructure.csproj", "Stross.Infrastructure/"]
+COPY ["Stross.Config/Stross.Config.csproj", "Stross.Config/"]
+COPY ["Stross.Proto/Stross.Proto.csproj", "Stross.Proto/"]
+COPY ["Stross.SubsonicModels/Stross.SubsonicModels.csproj", "Stross.SubsonicModels/"]
+RUN dotnet restore "Stross.API/Stross.API.csproj"
 COPY . .
-WORKDIR "/src/API"
-RUN dotnet build "API.csproj" -c Release -o /app/build
+WORKDIR "/src/Stross.API"
+RUN dotnet build "./Stross.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "API.csproj" -c Release -o /app/publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Stross.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "API.dll"]
+ENTRYPOINT ["dotnet", "Stross.API.dll"]
