@@ -1,4 +1,3 @@
-using Google.Protobuf.Collections;
 using Grpc.Core;
 using Stross.Downloader.YT.Downloaders;
 using Stross.Downloader.YT.Models;
@@ -33,10 +32,12 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
                 Title = outputData.Title,
                 SourceUrl = outputData.SourceUrl,
                 MusicTrackPath = outputData.MusicTrackPath,
-                ThumbnailPath = outputData.ThumbnailPath
+                ThumbnailPath = outputData.ThumbnailPath,
+                CreatorIds =
+                {
+                    outputData.CreatorIds
+                }
             };
-
-            reply.CreatorIds.AddRange(outputData.CreatorIds);
 
             return reply;
         }
@@ -44,7 +45,11 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
         {
             _logger.LogError(ex, "Download failed for URL: {Url}", request.SourceUrl);
 
-            return new DownloadMusicTrackReply { Error = ex.Message, Succeeded = false };
+            return new DownloadMusicTrackReply
+            {
+                Error = ex.Message,
+                Succeeded = false
+            };
         }
     }
 
@@ -70,13 +75,17 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
         {
             _logger.LogError(ex, "Failed to get metadata for creatorId: {CreatorId}", request.CreatorId);
 
-            return new GetCreatorMetadataReply { Error = ex.Message, Succeeded = false };
+            return new GetCreatorMetadataReply
+            {
+                Error = ex.Message,
+                Succeeded = false
+            };
         }
     }
 
     public override Task<PingReply> Ping(PingRequest request, ServerCallContext context)
     {
-        return Task.FromResult(new PingReply()
+        return Task.FromResult(new PingReply
         {
             Ready = true
         });

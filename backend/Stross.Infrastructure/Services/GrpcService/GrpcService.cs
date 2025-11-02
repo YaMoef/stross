@@ -1,6 +1,7 @@
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure.Services.GrpcService.Models;
 using Stross.Proto;
 
@@ -28,7 +29,10 @@ public class GrpcService : IGrpcService
             TargetLocationPath = targetPath
         }, cancellationToken:cancellationToken);
 
-        return new DownloadedMusicTrack(reply.SourceUrl, reply.Title, reply.CreatorIds.ToList(), reply.MusicTrackPath, reply.ThumbnailPath, reply.MusicTrackUrl);
+        if (!reply.Succeeded)
+            throw new ProviderException("Failed to download music track. Reason: " + reply.Error);
+
+        return new DownloadedMusicTrack(reply.SourceUrl, reply.Title, reply.CreatorIds.ToList(), reply.MusicTrackPath, reply.ThumbnailPath);
     }
 
     public async Task<FetchedCreatorMetadata> GetCreatorMetadataAsync(string creatorId, Provider providerToUse, CancellationToken cancellationToken = default)

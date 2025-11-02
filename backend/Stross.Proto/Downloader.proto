@@ -22,7 +22,6 @@ message DownloadMusicTrackReply {
   repeated string creatorIds = 5;
   string musicTrackPath = 6;
   string thumbnailPath = 7;
-  string musicTrackUrl = 8;
 }
 
 message GetCreatorMetadataRequest {

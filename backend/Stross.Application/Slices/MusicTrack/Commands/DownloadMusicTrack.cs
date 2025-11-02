@@ -65,6 +65,7 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
             await _grpcService.DownloadMusicTrackAsync(sanitizedUrl, providerToUse, cancellationToken);
 
         List<Creator> creatorsInDb = await _context.Creators
+            .Include(c => c.ExternalCreatorMusicTrack)
             .Where(c => c.ExternalCreatorMusicTrack.Any(ec => downloadedMusicTrack.CreatorIds.Contains(ec.ExternalId)))
             .ToListAsync(cancellationToken);
 
@@ -87,10 +88,10 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
                 if (string.IsNullOrWhiteSpace(extension) || extension == ".")
                     extension = ".jpg";
 
-                string thumbnailTargetPath = Path.Combine(_storageConfig.BasePath, "creators", Guid.NewGuid().ToString(), $"1{extension}");
+                string relativeThumbnailTargetPath = Path.Combine("creators", Guid.NewGuid().ToString(), $"1{extension}");
 
                 creatorToUse = new Creator(providerToUse, fetchedCreatorMetadata.CreatorId,
-                    fetchedCreatorMetadata.CreatorName, thumbnailTargetPath, fetchedCreatorMetadata.CreatorUrl);
+                    fetchedCreatorMetadata.CreatorName, relativeThumbnailTargetPath, fetchedCreatorMetadata.CreatorUrl);
 
                 externalCreatorMusicTrack = creatorToUse.ExternalCreatorMusicTrack.First();
 
@@ -102,15 +103,19 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
                 externalCreatorMusicTrack = creatorToUse.ExternalCreatorMusicTrack.First(ec => ec.ExternalId == creatorForTrack);
 
                 externalCreatorMusicTrack.SetExternalUrl(fetchedCreatorMetadata.CreatorUrl).SetExternalName(fetchedCreatorMetadata.CreatorName);
+
+                creatorsForMusicTrack.Add(creatorToUse);
             }
+
+            string fullThumbnailTargetPath = Path.Combine(_storageConfig.BasePath, externalCreatorMusicTrack.ThumbnailLocation);
 
             // always update the thumbnail
             await _thumbnailService.GetThumbnailUrlAsync(fetchedCreatorMetadata.CreatorThumbnailImageUrl,
-                externalCreatorMusicTrack.ThumbnailLocation, cancellationToken);
+                fullThumbnailTargetPath, cancellationToken);
         }
 
         Domain.Entities.MusicTrack musicTrack = new Domain.Entities.MusicTrack(providerToUse,
-            downloadedMusicTrack.MusicTrackPath, downloadedMusicTrack.Title, downloadedMusicTrack.ThumbnailPath, creatorsForMusicTrack, downloadedMusicTrack.ExternalUrl);
+            downloadedMusicTrack.MusicTrackPath, downloadedMusicTrack.Title, downloadedMusicTrack.ThumbnailPath, creatorsForMusicTrack, downloadedMusicTrack.SourceUrl);
 
         _context.MusicTracks.Add(musicTrack);
 

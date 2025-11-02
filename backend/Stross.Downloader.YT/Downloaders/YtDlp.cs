@@ -32,12 +32,17 @@ public class YtDlp
         CancellationToken cancellationToken = default)
     {
         Uri parsedUri = new Uri(sourceUrl);
-        string startPath = Path.Combine(_config.OutputPath, "musicTracks", targetLocationPath);
-        string outputPathAudio = Path.Combine(startPath, $"1.{_config.AudioFormat}");
-        string outputPathThumbnail = Path.Combine(startPath, "2.jpg");
+        string relativeStartPath = Path.Combine("music-tracks", targetLocationPath);
+        string fullStartPath = Path.Combine(_config.OutputPath, relativeStartPath);
 
-        if (!Path.Exists(startPath))
-            Directory.CreateDirectory(startPath);
+        string relativePathAudio = Path.Combine(relativeStartPath, $"1.{_config.AudioFormat}");
+        string relativePathThumbnail = Path.Combine(relativeStartPath, "2.jpg");
+
+        string fullOutputPathAudio = Path.Combine(_config.OutputPath, relativePathAudio);
+        string fullOutputPathThumbnail = Path.Combine(_config.OutputPath, relativePathThumbnail);
+
+        if (!Path.Exists(fullStartPath))
+            Directory.CreateDirectory(fullStartPath);
 
         NameValueCollection parsed =
             HttpUtility.ParseQueryString(parsedUri.Query.Split('?').Skip(1).FirstOrDefault() ?? "");
@@ -49,16 +54,18 @@ public class YtDlp
         else
             throw new YtDlpException("Video ID not found in URL");
 
-        _logger.LogInformation("Loading metadata for URL: {SourceUrl}", sourceUrl);
+        string sanitizedUrl = $"https://www.youtube.com/watch?v={videoId}";
+
+        _logger.LogInformation("Loading metadata for URL: {SanitizedUrl}", sanitizedUrl);
         YoutubeVideoMetadata videoMetadata = await GetVideoMetaDataAsync(parsedUri.ToString(), cancellationToken);
         string channelId = await GetChannelIdAsync(videoMetadata.AuthorUrl, cancellationToken);
-        await DownloadThumbnailAsync(videoId, outputPathThumbnail, cancellationToken);
+        await DownloadThumbnailAsync(videoId, fullOutputPathThumbnail, cancellationToken);
         _logger.LogDebug("Done loading metadata");
 
-        _logger.LogInformation("Starting download for URL: {SourceUrl} to path: {OutputPathAudio}", sourceUrl,
-            outputPathAudio);
+        _logger.LogInformation("Starting download for URL: {SanitizedUrl} to path: {OutputPathAudio}", sanitizedUrl,
+            fullOutputPathAudio);
         _youtubeDlp.VideoUrl = parsedUri.ToString();
-        _youtubeDlp.Options.FilesystemOptions.Output = outputPathAudio;
+        _youtubeDlp.Options.FilesystemOptions.Output = fullOutputPathAudio;
         _youtubeDlp.Options.PostProcessingOptions.ExtractAudio = true;
         _youtubeDlp.YoutubeDlPath = _config.YtDlpPath;
 
@@ -76,10 +83,10 @@ public class YtDlp
             throw new YtDlpException(error);
         }
 
-        _logger.LogDebug("Download completed successfully for URL: {SourceUrl}", sourceUrl);
+        _logger.LogDebug("Download completed successfully for URL: {SanitizedUrl}", sanitizedUrl);
 
-        return new MusicTrackMetadata(sourceUrl, videoMetadata.Title, [channelId], outputPathAudio,
-            outputPathThumbnail);
+        return new MusicTrackMetadata(sanitizedUrl, videoMetadata.Title, [channelId], relativePathAudio,
+            relativePathThumbnail);
     }
 
     public async Task<CreatorMetadata> GetCreatorMetadataAsync(string creatorId,
