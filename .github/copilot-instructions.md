@@ -1,19 +1,20 @@
 # Copilot Instructions for Stross Backend Development
 
 ## Project Overview
-This is a .NET backend application built with Clean Architecture principles, using gRPC for communication, MediatR for CQRS pattern implementation, vertical sliced, minimal api based, and Domain-Driven Design (DDD) principles.
+This is a .NET backend application built with Clean Architecture principles, using minimal APIs for HTTP endpoints and gRPC only for communication with the downloader service, MediatR for CQRS pattern implementation, vertical sliced, minimal api based, and Domain-Driven Design (DDD) principles.
 
 ## Architecture Guidelines
 
 ### Project Structure
 - **Stross.Domain**: Core business logic, entities, value objects, and domain services
 - **Stross.Application**: Application services, use cases, DTOs, and MediatR handlers
-- **Stross.Infrastructure**: Data access, external services, and infrastructure concerns
-- **Stross.API**: gRPC services and API controllers
-- **Stross.Proto**: Protocol buffer definitions for gRPC
+- **Stross.Infrastructure**: Data access, external services, and infrastructure concerns (including gRPC clients for downloader service)
+- **Stross.API**: Minimal API endpoints only
+- **Stross.Proto**: Protocol buffer definitions for gRPC communication with downloader service only
 - **Stross.Config**: Configuration models and settings
-- **Stross.Downloader.YT**: Specialized YouTube service for download operations and fetching metadata
+- **Stross.Downloader.YT**: Specialized YouTube service for download operations and fetching metadata (uses gRPC server)
 - **Stross.Exception**: Contains all the exceptions that the application can throw
+- **Stross.SubsonicModels**: Auto-generated classes from the official Subsonic API schema (version 1.16.1) that provide full compliance with the Subsonic specification. Contains all response models, data structures, and API contracts required for Subsonic endpoint implementations
 
 ### Clean Code Principles
 1. **Single Responsibility Principle**: Each class should have one reason to change
@@ -25,6 +26,8 @@ This is a .NET backend application built with Clean Architecture principles, usi
 7. **Whitespace Before Returns**: Always add a blank line before return statements when there is code above (applies to all code blocks, usings, if statements, foreach, do-while, etc.)
 8. **Explicit Type Declarations**: Never use the `var` keyword - always use explicit type declarations for clarity
 9. **Separate Input/Response Models**: Divide DTOs into separate Input and Response models instead of using generic DTOs
+10. **Immutable Properties**: Use `init` accessors instead of `set` for DTOs and response models to ensure immutability after initialization
+11. **Prefer Record Types**: Use `record` types instead of `class` for DTOs, value objects, and data-only models as they provide immutability, value equality, and better functional programming support by default
 
 #### Vertical Slicing Guidelines
 - Organize code by feature rather than by layer
@@ -135,56 +138,136 @@ public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, GetOrderRespo
 - Implement LoggingBehaviour for request/response logging
 - Add PerformanceBehaviour for monitoring slow requests
 
-### gRPC Service Guidelines
+#### DTO Models with Immutable Properties
+Always use `record` types with required properties in the primary constructor for DTOs to ensure immutability after initialization:
 
-#### Proto File Organization
+```csharp
+// Input Model Example (using record with primary constructor)
+public sealed record CreateOrderInput(Guid CustomerId, List<OrderItemInput> Items)
+{
+    public string? Notes { get; init; }
+}
+
+// Response Model Example (using record with primary constructor)
+public sealed record CreateOrderResponse(Guid OrderId, DateTime CreatedAt)
+{
+    public string Status { get; init; } = string.Empty;
+    public List<OrderItem> Items { get; init; } = [];
+}
+
+// Simple record for DTOs with only required properties
+public sealed record CreateOrderInput(Guid CustomerId, List<OrderItemInput> Items, string? Notes = null);
+```
+
+#### Subsonic API Guidelines
+When creating Subsonic commands and queries, always follow these specific patterns:
+
+- **All Subsonic Commands and Queries MUST return `SubsonicBaseResponse`**: This ensures consistency with the Subsonic API specification and allows the `SubsonicBehaviour` pipeline to properly handle responses.
+- **Use the `SubsonicBehaviour` pipeline**: This behavior automatically sets the response status, version, and handles exceptions appropriately for Subsonic responses.
+- **Error Handling**: Throw `StrossException` derived exceptions which will be caught by the `SubsonicBehaviour` and converted to proper Subsonic error responses.
+- **ALWAYS use models from `Stross.SubsonicModels` project**: All Subsonic-related data structures, response objects, and API models MUST come from the `Stross.SubsonicModels` project. This project contains auto-generated classes from the official Subsonic API schema and ensures full compliance with the Subsonic specification. Never create custom models that duplicate or replace these official models.
+
+Example Subsonic command pattern:
+```csharp
+using Stross.SubsonicModels; // Always import from SubsonicModels project
+
+public sealed record SubsonicPingCommand() : IRequest<SubsonicBaseResponse>;
+
+internal sealed class SubsonicPingCommandHandler : IRequestHandler<SubsonicPingCommand, SubsonicBaseResponse>
+{
+    public Task<SubsonicBaseResponse> Handle(SubsonicPingCommand request, CancellationToken cancellationToken)
+    {
+        // Use Response from Stross.SubsonicModels
+        Response response = new Response
+        {
+            Status = ResponseStatus.Ok, // This will be set by SubsonicBehaviour
+            Version = "1.16.1", // This will be set by SubsonicBehaviour
+        };
+
+        return Task.FromResult(new SubsonicBaseResponse(response));
+    }
+}
+```
+
+Example Subsonic query pattern:
+```csharp
+using Stross.SubsonicModels; // Always import from SubsonicModels project
+
+public sealed record SubsonicSearchQuery(SubsonicSearchInput Input) : IRequest<SubsonicBaseResponse>;
+
+internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearchQuery, SubsonicBaseResponse>
+{
+    public async Task<SubsonicBaseResponse> Handle(SubsonicSearchQuery request, CancellationToken cancellationToken)
+    {
+        // Implementation logic here
+        // Use Response and other models from Stross.SubsonicModels
+        Response response = new Response();
+        
+        // Example: Use official models like Child, Artist, Album, etc.
+        List<Child> songs = new List<Child>();
+        response.SearchResult = new SearchResult
+        {
+            Match = songs
+        };
+        
+        return new SubsonicBaseResponse(response);
+    }
+}
+```
+
+### gRPC Guidelines (Infrastructure Layer Only)
+
+**Important**: gRPC should ONLY be used in the Infrastructure layer for communication with the downloader service. The API layer should only expose minimal HTTP endpoints and remain agnostic of gRPC implementation details.
+
+#### Proto File Organization (Downloader Service Only)
 - Use semantic versioning for service definitions
-- Group related operations in the same service
+- Group related download operations in the same service
 - Use appropriate field numbers and avoid reusing them
 - Include comprehensive documentation in proto files
+- Focus on download-specific operations like metadata retrieval and download requests
 
-Example proto service:
+Example proto service for downloader communication:
 ```protobuf
 syntax = "proto3";
 
-package stross.v1;
+package stross.downloader.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-service OrderService {
-  rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
-  rpc GetOrder(GetOrderRequest) returns (OrderResponse);
-  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+service DownloaderService {
+  rpc GetMetadata(GetMetadataRequest) returns (MetadataResponse);
+  rpc DownloadTrack(DownloadRequest) returns (DownloadResponse);
+  rpc GetDownloadStatus(StatusRequest) returns (StatusResponse);
 }
 
-message CreateOrderRequest {
-  string customer_id = 1;
-  repeated OrderItem items = 2;
+message GetMetadataRequest {
+  string url = 1;
+  string provider = 2;
 }
 ```
 
-#### gRPC Service Implementation
+#### gRPC Client Implementation (Infrastructure Layer)
 ```csharp
-public class OrderGrpcService : OrderService.OrderServiceBase
+public class DownloaderGrpcClient : IDownloaderService
 {
-    private readonly IMediator _mediator;
+    private readonly DownloaderService.DownloaderServiceClient _client;
     private readonly IMapper _mapper;
     
-    public OrderGrpcService(IMediator mediator, IMapper mapper)
+    public DownloaderGrpcClient(DownloaderService.DownloaderServiceClient client, IMapper mapper)
     {
-        _mediator = mediator;
+        _client = client;
         _mapper = mapper;
     }
     
-    public override async Task<OrderResponse> CreateOrder(
-        CreateOrderRequest request, 
-        ServerCallContext context)
+    public async Task<MetadataResponse> GetMetadataAsync(
+        GetMetadataRequest request, 
+        CancellationToken cancellationToken = default)
     {
-        CreateOrderCommand command = _mapper.Map<CreateOrderCommand>(request);
-        CreateOrderResponse result = await _mediator.Send(command);
+        GetMetadataRequest grpcRequest = _mapper.Map<GetMetadataRequest>(request);
+        MetadataResponse response = await _client.GetMetadataAsync(grpcRequest, cancellationToken: cancellationToken);
         
-        return _mapper.Map<OrderResponse>(result);
+        return _mapper.Map<MetadataResponse>(response);
     }
 }
 ```
@@ -193,10 +276,10 @@ public class OrderGrpcService : OrderService.OrderServiceBase
 
 #### When creating new features:
 1. **Start with the Domain**: Create entities, value objects, and domain services first
-2. **Define the Contract**: Create proto files for gRPC endpoints
+2. **Define the Contract**: Create minimal API endpoints for HTTP communication (gRPC only for downloader service)
 3. **Implement Application Layer**: Create commands/queries and their handlers
 4. **Add Infrastructure**: Implement repositories and external service integrations
-5. **Create gRPC Services**: Implement the gRPC service layer
+5. **Create API Endpoints**: Implement minimal API endpoints for the feature
 6. **Add Validation**: Implement FluentValidation rules
 7. **Write Tests**: Create unit tests for domain logic and integration tests for handlers
 
