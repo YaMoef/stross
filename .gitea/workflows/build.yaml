@@ -24,7 +24,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend
-          file: ./backend/Stross.API/Dockerfile/Dockerfile
+          file: ./backend/Stross.API/Dockerfile
           push: true
           tags: "${{ vars.DOCKER_API_REPOSITORY }}:dev"
 
@@ -32,6 +32,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend
-          file: ./backend/Stross.Downloader.YT/Dockerfile/Dockerfile
+          file: ./backend/Stross.Downloader.YT/Dockerfile
           push: true
           tags: "${{ vars.DOCKER_DOWNLOADER_YT_REPOSITORY }}:dev"
