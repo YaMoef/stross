@@ -20,5 +20,9 @@ RUN dotnet publish "./Stross.Downloader.YT.csproj" -c $BUILD_CONFIGURATION -o /a
 
 FROM base AS final
 WORKDIR /app
+
+RUN https://github.com/yt-dlp/yt-dlp/releases/download/2025.10.22/yt-dlp -O /usr/local/bin/yt-dlp && \
+    chmod a+rx /usr/local/bin/yt-dlp
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Stross.Downloader.YT.dll"]
