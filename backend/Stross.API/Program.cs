@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Stross.API.Endpoints;
+using Stross.API.Middleware;
 using Stross.Application;
 using Stross.Application.Slices.MusicTrack;
 using Stross.Application.Slices.Provider;
+using Stross.Application.Slices.Subsonic;
+using Stross.Application.Slices.Thumbnail;
 using Stross.Config;
 using Stross.Infrastructure;
 
@@ -24,10 +27,9 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000");
-        policy.AllowCredentials();
+        policy.AllowAnyOrigin();
+        // policy.AllowCredentials();
         policy.AllowAnyMethod();
-        policy.WithHeaders("Authorization");
         policy.AllowAnyHeader();
     });
 });
@@ -48,6 +50,8 @@ builder.Services.AddProblemDetails(opts =>
 
 builder.AddMusicTrackSlice();
 builder.AddProviderSlice();
+builder.AddSubsonicSlice();
+builder.AddThumbnailSlice();
 
 WebApplication app = builder.Build();
 
@@ -91,6 +95,8 @@ using (IServiceScope scope = app.Services.CreateScope())
     }
 }
 
+app.UseSubsonicSuffixMiddleware();
+
 app.UseRouting();
 
 app.UseCors();
@@ -99,8 +105,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app
-    .MapGroup("v1")
+    .MapGroup("api/v1")
     .MapMusicTrackEndpoints()
-    .MapProviderEndpoints();
+    .MapProviderEndpoints()
+    .MapThumbnailEndpoints();
+
+app.MapSubsonicEndpoints();
 
 app.Run();

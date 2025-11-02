@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Stross.Domain\Stross.Domain.csproj"/>
         <ProjectReference Include="..\Stross.Exception\Stross.Exception.csproj"/>
         <ProjectReference Include="..\Stross.Infrastructure\Stross.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Stross.SubsonicModels\Stross.SubsonicModels.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
