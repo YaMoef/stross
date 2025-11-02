@@ -83,6 +83,9 @@ public class YtDlp
             throw new YtDlpException(error);
         }
 
+        if(!File.Exists(fullOutputPathAudio))
+            throw new YtDlpException("Audio file not found after download");
+
         _logger.LogDebug("Download completed successfully for URL: {SanitizedUrl}", sanitizedUrl);
 
         return new MusicTrackMetadata(sanitizedUrl, videoMetadata.Title, [channelId], relativePathAudio,
