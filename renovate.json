@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "schedule": "after 3pm on friday",
+  "baseBranches": [
+    "main"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["/dotnet-sdk/"],
+      "matchManagers": ["global.json"],
+      "enabled": false
+    }
+  ]
+}
