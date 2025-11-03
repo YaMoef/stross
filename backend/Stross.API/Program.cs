@@ -96,6 +96,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 }
 
 app.UseSubsonicSuffixMiddleware();
+app.UseSubsonicFormatCaptureMiddleware();
 
 app.UseRouting();
 

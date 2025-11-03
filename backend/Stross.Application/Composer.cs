@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Stross.Application.Behaviours;
+using Stross.Application.Slices.Subsonic.Services;
 
 namespace Stross.Application;
 
@@ -22,6 +23,7 @@ public static class Composer
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(SubsonicBehaviour<,>));
+        services.AddScoped<ISubsonicResponseFormatService, SubsonicResponseFormatService>();
 
         return services;
     }

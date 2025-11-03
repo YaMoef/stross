@@ -1,6 +1,8 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using MediatR;
+using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.Subsonic.Commands;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Queries;
@@ -20,6 +22,18 @@ internal static class SubsonicEndpoints
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
+    private static IResult CreateSubsonicResult(SubsonicBaseResponse response)
+    {
+        if (response.Format == SubsonicResponseFormat.Xml)
+        {
+            string xmlContent = XmlSerializationHelper.SerializeSubsonicResponse(response);
+
+            return Results.Content(xmlContent, "application/xml", Encoding.UTF8);
+        }
+
+        return Results.Json(response, JsonOptions);
+    }
+
     internal static IEndpointRouteBuilder MapSubsonicEndpoints(this IEndpointRouteBuilder endpoints)
     {
         RouteGroupBuilder subsonicGroup = endpoints.MapGroup("/rest/");
@@ -31,7 +45,7 @@ internal static class SubsonicEndpoints
                     SubsonicPingCommand command = new SubsonicPingCommand();
                     SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicPing")
             .WithSummary("Test connectivity with the Subsonic server")
@@ -44,7 +58,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearchQuery query = new SubsonicSearchQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch")
             .WithSummary("Search for files (deprecated, use search2 instead)")
@@ -57,7 +71,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearch2Query query = new SubsonicSearch2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch2")
             .WithSummary("Search for albums, artists and songs")
@@ -70,7 +84,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearch3Query query = new SubsonicSearch3Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch3")
             .WithSummary("Search for albums, artists and songs organized by ID3 tags")
@@ -84,7 +98,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetMusicFoldersQuery query = new SubsonicGetMusicFoldersQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicFolders")
             .WithSummary("Returns available music folders")
@@ -97,7 +111,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetIndexesQuery query = new SubsonicGetIndexesQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetIndexes")
             .WithSummary("Returns an indexed structure of all artists")
@@ -110,7 +124,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetMusicDirectoryQuery query = new SubsonicGetMusicDirectoryQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicDirectory")
             .WithSummary("Returns a listing of all files in a music directory")
@@ -124,7 +138,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetGenresQuery query = new SubsonicGetGenresQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetGenres")
             .WithSummary("Returns all genres")
@@ -137,7 +151,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetArtistsQuery query = new SubsonicGetArtistsQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtists")
             .WithSummary("Returns an indexed structure of all artists organized by ID3 tags")
@@ -150,7 +164,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetPlaylistsQuery query = new SubsonicGetPlaylistsQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetPlaylists")
             .WithSummary("Returns all playlists")
@@ -164,7 +178,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetBookmarksQuery query = new SubsonicGetBookmarksQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetBookmarks")
             .WithSummary("Returns all bookmarks")
@@ -177,7 +191,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetStarredQuery query = new SubsonicGetStarredQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred")
             .WithSummary("Returns starred songs, albums and artists")
@@ -190,7 +204,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetStarred2Query query = new SubsonicGetStarred2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred2")
             .WithSummary("Returns starred songs, albums and artists organized by ID3 tags")
@@ -203,7 +217,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetSongQuery query = new SubsonicGetSongQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetSong")
             .WithSummary("Returns details for a specific song")
@@ -216,7 +230,7 @@ internal static class SubsonicEndpoints
                     SubsonicScrobbleCommand command = new SubsonicScrobbleCommand(input);
                     SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
 
-                    return Results.Json(result, JsonOptions);
+                    return CreateSubsonicResult(result);
                 })
             .WithName("SubsonicScrobble")
             .WithSummary("Registers the local playback of a track")
