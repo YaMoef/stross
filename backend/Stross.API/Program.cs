@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Stross.API.Endpoints;
@@ -9,6 +11,7 @@ using Stross.Application.Slices.Subsonic;
 using Stross.Application.Slices.Thumbnail;
 using Stross.Config;
 using Stross.Infrastructure;
+using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -48,12 +51,39 @@ builder.Services.AddProblemDetails(opts =>
     };
 });
 
+string? reverseProxyHost = builder.Configuration.GetValue<string?>("reverseProxyHost");
+
+if (!string.IsNullOrEmpty(reverseProxyHost))
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+
+        bool isIpParseable = IPAddress.TryParse(reverseProxyHost, out IPAddress? ip);
+
+        if (isIpParseable)
+        {
+            if(ip is not null)
+                options.KnownProxies.Add(ip);
+        }
+        else
+        {
+            IPAddress[] addresses = Dns.GetHostAddresses(reverseProxyHost);
+            options.KnownProxies.Add(addresses[0]);
+        }
+    });
+}
+
 builder.AddMusicTrackSlice();
 builder.AddProviderSlice();
 builder.AddSubsonicSlice();
 builder.AddThumbnailSlice();
 
 WebApplication app = builder.Build();
+
+if(!string.IsNullOrEmpty(reverseProxyHost))
+    app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment()) // development
 {
