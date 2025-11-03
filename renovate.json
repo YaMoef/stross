@@ -5,12 +5,17 @@
     ":semanticCommits"
   ],
   "schedule": "after 3pm on friday",
-  "baseBranches": [
+  "baseBranchPatterns": [
     "main"
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["dotnet-sdk", "mcr.microsoft.com/dotnet/aspnet", "mcr.microsoft.com/dotnet/sdk", "MediatR"],
+      "matchPackageNames": [
+        "dotnet-sdk",
+        "mcr.microsoft.com/dotnet/aspnet",
+        "mcr.microsoft.com/dotnet/sdk",
+        "MediatR"
+      ],
       "enabled": false
     }
   ]
