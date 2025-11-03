@@ -10,8 +10,7 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["/dotnet-sdk/"],
-      "matchManagers": ["global.json"],
+      "matchPackageNames": ["dotnet-sdk", "mcr.microsoft.com/dotnet/aspnet", "mcr.microsoft.com/dotnet/sdk", "MediatR"],
       "enabled": false
     }
   ]
