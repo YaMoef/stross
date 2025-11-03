@@ -12,5 +12,6 @@ The first release would be nice if it has the following features:
 - SAML or OAuth support
 - Create playlists
 - Have a Subsonic interface
+  - EXTRA: support [OpenSubsonic](https://opensubsonic.netlify.app/)
 - Download all the music locally
 - Have a clean frontend
