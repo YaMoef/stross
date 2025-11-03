@@ -51,7 +51,7 @@ builder.Services.AddProblemDetails(opts =>
     };
 });
 
-string? reverseProxyHost = builder.Configuration.GetValue<string?>("reverseProxyHost");
+string? reverseProxyHost = builder.Configuration.GetValue<string?>("ReverseProxyHost");
 
 if (!string.IsNullOrEmpty(reverseProxyHost))
 {
