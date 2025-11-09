@@ -35,12 +35,13 @@ internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicG
     {
         // Build the query for creators (artists)
         IQueryable<Creator> creatorsQuery = _context.Creators
-            .Include(c => c.ExternalCreatorMusicTrack);
+            .Include(c => c.Albums)
+            .Include(c => c.ExternalCreators);
 
         // Filter by music folder if specified
         if (!string.IsNullOrEmpty(request.Input.MusicFolderId) && int.TryParse(request.Input.MusicFolderId, out int musicFolderId))
             creatorsQuery = creatorsQuery.Where(c =>
-                c.ExternalCreatorMusicTrack.Any(e => e.ProviderId == musicFolderId));
+                c.ExternalCreators.Any(e => e.ProviderId == musicFolderId));
 
         // Get all creators and group them alphabetically
         List<Creator> creators = await creatorsQuery

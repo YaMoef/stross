@@ -8,6 +8,7 @@ using Stross.Config;
 using Stross.Domain.Entities;
 using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
+using Stross.Infrastructure.Constants;
 using Stross.Infrastructure.Services.GrpcService;
 using Stross.Infrastructure.Services.GrpcService.Models;
 using Stross.Infrastructure.Services.ThumbnailService;
@@ -47,6 +48,9 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
     {
         string sanitizedUrl = request.Input.SourceUrl.SanitizeString() ?? throw new ValidationException(nameof(request.Input.SourceUrl), "Source URL is required.");
 
+        Genre unknownGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == Constants.UnknownName, cancellationToken) ??
+                             throw new EntityNotFoundException(nameof(Genre));
+
         Domain.Entities.MusicTrack? musicTrackInDb = await _context.MusicTracks.FirstOrDefaultAsync(m => m.ExternalUrl.ToLower() == sanitizedUrl.ToLower(), cancellationToken);
 
         if (musicTrackInDb is not null)
@@ -65,8 +69,9 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
             await _grpcService.DownloadMusicTrackAsync(sanitizedUrl, providerToUse, cancellationToken);
 
         List<Creator> creatorsInDb = await _context.Creators
-            .Include(c => c.ExternalCreatorMusicTrack)
-            .Where(c => c.ExternalCreatorMusicTrack.Any(ec => downloadedMusicTrack.CreatorIds.Contains(ec.ExternalId)))
+            .Include(c => c.ExternalCreators)
+            .Include(c => c.Albums)
+            .Where(c => c.ExternalCreators.Any(ec => downloadedMusicTrack.CreatorIds.Contains(ec.ExternalId)))
             .ToListAsync(cancellationToken);
 
         List<Creator> creatorsForMusicTrack = new List<Creator>();
@@ -77,9 +82,9 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
                 await _grpcService.GetCreatorMetadataAsync(creatorForTrack, providerToUse, cancellationToken);
 
             Creator? creatorToUse =
-                creatorsInDb.Find(c => c.ExternalCreatorMusicTrack.Any(ec => ec.ExternalId == creatorForTrack));
+                creatorsInDb.Find(c => c.ExternalCreators.Any(ec => ec.ExternalId == creatorForTrack));
 
-            ExternalCreatorMusicTrack? externalCreatorMusicTrack;
+            ExternalCreator? externalCreatorMusicTrack;
 
             if (creatorToUse is null)
             {
@@ -93,14 +98,14 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
                 creatorToUse = new Creator(providerToUse, fetchedCreatorMetadata.CreatorId,
                     fetchedCreatorMetadata.CreatorName, relativeThumbnailTargetPath, fetchedCreatorMetadata.CreatorUrl);
 
-                externalCreatorMusicTrack = creatorToUse.ExternalCreatorMusicTrack.First();
+                externalCreatorMusicTrack = creatorToUse.ExternalCreators.First();
 
                 _context.Creators.Add(creatorToUse);
                 creatorsForMusicTrack.Add(creatorToUse);
             }
             else
             {
-                externalCreatorMusicTrack = creatorToUse.ExternalCreatorMusicTrack.First(ec => ec.ExternalId == creatorForTrack);
+                externalCreatorMusicTrack = creatorToUse.ExternalCreators.First(ec => ec.ExternalId == creatorForTrack);
 
                 externalCreatorMusicTrack.SetExternalUrl(fetchedCreatorMetadata.CreatorUrl).SetExternalName(fetchedCreatorMetadata.CreatorName);
 
@@ -114,8 +119,24 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
                 fullThumbnailTargetPath, cancellationToken);
         }
 
+        Creator mainCreator = creatorsForMusicTrack.First();
+
+        Album? albumToUse = mainCreator.Albums.FirstOrDefault(a => a.Name == Constants.UnknownName);
+
+        if (albumToUse is null)
+        {
+            albumToUse = new Album(mainCreator, unknownGenre, Constants.UnknownName);
+            _context.Albums.Add(albumToUse);
+        }
+
         Domain.Entities.MusicTrack musicTrack = new Domain.Entities.MusicTrack(providerToUse,
-            downloadedMusicTrack.MusicTrackPath, downloadedMusicTrack.Title, downloadedMusicTrack.ThumbnailPath, creatorsForMusicTrack, downloadedMusicTrack.SourceUrl);
+            albumToUse,
+            unknownGenre,
+            downloadedMusicTrack.MusicTrackPath,
+            downloadedMusicTrack.Title,
+            downloadedMusicTrack.ThumbnailPath,
+            creatorsForMusicTrack,
+            downloadedMusicTrack.SourceUrl);
 
         _context.MusicTracks.Add(musicTrack);
 

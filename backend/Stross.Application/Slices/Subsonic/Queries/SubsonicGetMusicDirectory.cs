@@ -39,30 +39,69 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetMusicDirectoryQuery request, CancellationToken cancellationToken)
     {
-        string id = request.Input.Id;
-
-        // Try to parse as created ID (music folder)
-        if (int.TryParse(id, out int creatorId))
+        // parse as a long
+        if (long.TryParse(request.Input.Id, out long parsedId))
         {
-            Creator? creator = await _context.Creators
-                .FirstOrDefaultAsync(p => p.Id == creatorId, cancellationToken);
+            // Check if it's a provider
+            Domain.Entities.Provider? provider = await _context.Providers
+                .FirstOrDefaultAsync(p => p.Id == parsedId, cancellationToken);
 
-            if (creator is not null)
+            if (provider is not null)
             {
-                List<Domain.Entities.MusicTrack> allMusicTracksForProvider =
-                    await _context.MusicTracks
-                        .Include(m => m.Creators)
-                        .ThenInclude(m => m.ExternalCreatorMusicTrack)
-                        .Where(m => m.Creators.Any() && m.Creators.FirstOrDefault()!.Id == creatorId)
-                        .ToListAsync(cancellationToken);
+                List<Creator> creatorsInProvider = await _context.Creators
+                    .Include(c => c.ExternalCreators)
+                    .Where(c => c.ExternalCreators.Any(ecmt => ecmt.ProviderId == parsedId))
+                    .OrderBy(c => c.Name)
+                    .ToListAsync(cancellationToken);
 
                 Response response = new Response
                 {
                     Directory = new Directory
                     {
-                        Id = creatorId.ToString(),
+                        Id = provider.Id.ToString(),
+                        Name = provider.Name,
+                        Child = creatorsInProvider.Select(c => new Child
+                        {
+                            Id = c.Id.ToString(),
+                            Parent = provider.Id.ToString(),
+                            Title = c.Name,
+                            IsDir = true,
+                            Artist = c.Name,
+                            CoverArt = c.Id.ToString()
+                        }).ToList()
+                    }
+                };
+
+                return new SubsonicBaseResponse(response);
+            }
+
+            // Check if it's a creator (show music tracks within a creator)
+            Creator? creator = await _context.Creators
+                .Include(c => c.ExternalCreators)
+                .ThenInclude(ecmt => ecmt.Provider)
+                .FirstOrDefaultAsync(c => c.Id == parsedId, cancellationToken);
+
+            if (creator is not null)
+            {
+                List<Domain.Entities.MusicTrack> musicTracksForCreator = await _context.MusicTracks
+                    .Include(m => m.Creators)
+                    .Include(m => m.Provider)
+                    .Where(m => m.Creators.Any(c => c.Id == parsedId))
+                    .OrderBy(m => m.FriendlyName)
+                    .ToListAsync(cancellationToken);
+
+                // Get the parent provider ID from the creator's external relationship
+                ExternalCreator? externalRelation = creator.ExternalCreators.FirstOrDefault();
+                string parentId = externalRelation?.ProviderId.ToString() ?? "1";
+
+                Response response = new Response
+                {
+                    Directory = new Directory
+                    {
+                        Id = creator.Id.ToString(),
                         Name = creator.Name,
-                        Child = allMusicTracksForProvider.Select(c => c.ToSubsonicSongResponse()).ToList()
+                        Parent = parentId,
+                        Child = musicTracksForCreator.Select(t => t.ToSubsonicSongResponse()).ToList()
                     }
                 };
 

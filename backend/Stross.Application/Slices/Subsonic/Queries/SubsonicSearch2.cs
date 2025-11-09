@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -34,7 +35,7 @@ internal sealed class SubsonicSearch2QueryHandler : IRequestHandler<SubsonicSear
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicSearch2Query request, CancellationToken cancellationToken)
     {
-        string searchQuery = request.Input.Query.ToLower();
+        string searchQuery = request.Input.Query.SanitizeSearchString()!;
 
         // Search for artists (creators)
         List<Creator> artists = await _context.Creators

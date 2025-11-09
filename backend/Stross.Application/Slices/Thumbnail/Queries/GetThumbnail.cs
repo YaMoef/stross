@@ -55,13 +55,13 @@ internal sealed class GetThumbnailQueryHandler : IRequestHandler<GetThumbnailQue
     private async Task<string> GetCreatorThumbnailAsync(long creatorId, CancellationToken cancellationToken)
     {
         Creator? creator = await _context.Creators
-            .Include(c => c.ExternalCreatorMusicTrack)
+            .Include(c => c.ExternalCreators)
             .FirstOrDefaultAsync(c => c.Id == creatorId, cancellationToken);
 
         if (creator is null)
             throw new EntityNotFoundException(nameof(Creator));
 
-        ExternalCreatorMusicTrack? externalCreator = creator.ExternalCreatorMusicTrack.FirstOrDefault();
+        ExternalCreator? externalCreator = creator.ExternalCreators.FirstOrDefault();
         if (externalCreator is null || string.IsNullOrEmpty(externalCreator.ThumbnailLocation))
             throw new EntityNotFoundException(nameof(Creator));
 

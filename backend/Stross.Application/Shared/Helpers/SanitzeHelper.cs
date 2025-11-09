@@ -9,4 +9,14 @@ public static class SanitzeHelper
 
         return input.Trim();
     }
+
+    public static string? SanitizeSearchString(this string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
+        string trimmed = input.Trim();
+
+        return trimmed.Trim('\'', '"').ToLower();
+    }
 }

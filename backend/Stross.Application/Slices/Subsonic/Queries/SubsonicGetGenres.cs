@@ -31,19 +31,19 @@ internal sealed class SubsonicGetGenresQueryHandler : IRequestHandler<SubsonicGe
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetGenresQuery request, CancellationToken cancellationToken)
     {
-        int totalSongCount = await _context.MusicTracks.CountAsync(cancellationToken);
+        List<Domain.Entities.Genre> allGenres = await _context.Genres
+            .Include(g => g.MusicTracks)
+            .Include(g => g.Albums)
+            .ToListAsync(cancellationToken);
 
         Response response = new Response
         {
-            Genres = new List<Genre>
+            Genres = allGenres.Select(g => new Genre()
             {
-                new Genre
-                {
-                    Text = ["UnKnown"],
-                    SongCount = totalSongCount,
-                    AlbumCount = 0
-                }
-            }
+                Text = [g.Name],
+                SongCount = g.MusicTracks.Count,
+                AlbumCount = g.Albums.Count
+            }).ToList()
         };
 
         return new SubsonicBaseResponse(response);

@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -40,17 +41,23 @@ internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearc
             .AsQueryable();
 
         // Apply search filters
-        if (!string.IsNullOrEmpty(request.Input.Artist))
-            query = query.Where(x => x.Creators.Any(c => c.Name.Contains(request.Input.Artist)));
+        string? sanitizedArtistSearch = request.Input.Artist.SanitizeSearchString();
 
-        if (!string.IsNullOrEmpty(request.Input.Title))
-            query = query.Where(x => x.FriendlyName.Contains(request.Input.Title) ||
-                                     x.OriginalName.Contains(request.Input.Title));
+        if (!string.IsNullOrEmpty(sanitizedArtistSearch))
+            query = query.Where(x => x.Creators.Any(c => c.Name.Contains(sanitizedArtistSearch)));
 
-        if (!string.IsNullOrEmpty(request.Input.Any))
-            query = query.Where(x => x.FriendlyName.Contains(request.Input.Any) ||
-                                     x.OriginalName.Contains(request.Input.Any) ||
-                                     x.Creators.Any(c => c.Name.Contains(request.Input.Any)));
+        string? sanitizedAlbumSearch = request.Input.Album.SanitizeSearchString();
+
+        if (!string.IsNullOrEmpty(sanitizedAlbumSearch))
+            query = query.Where(x => x.FriendlyName.Contains(sanitizedAlbumSearch) ||
+                                     x.OriginalName.Contains(sanitizedAlbumSearch));
+
+        string? sanitizedAnySearch = request.Input.Any.SanitizeSearchString();
+
+        if (!string.IsNullOrEmpty(sanitizedAnySearch))
+            query = query.Where(x => x.FriendlyName.Contains(sanitizedAnySearch) ||
+                                     x.OriginalName.Contains(sanitizedAnySearch) ||
+                                     x.Creators.Any(c => c.Name.Contains(sanitizedAnySearch)));
 
         if (request.Input.NewerThan.HasValue)
         {

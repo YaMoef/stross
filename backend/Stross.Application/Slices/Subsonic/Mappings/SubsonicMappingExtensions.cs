@@ -11,10 +11,13 @@ public static class SubsonicMappingExtensions
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
+            // StarredSpecified = 
             // Starred = null, // TODO: Implement starring functionality
             ArtistImageUrl = "/api/v1/thumbnails/creator/" + creator.Id + "?type=thumbnail"
+            // UserRatingSpecified = 
             // UserRating = null, // TODO: Implement user rating functionality
             // AverageRating = null // TODO: Implement average rating functionality
+            // AverageRatingSpecified = 
         };
     }
 
@@ -26,13 +29,14 @@ public static class SubsonicMappingExtensions
         return new Child
         {
             Id = musicTrack.Id.ToString(),
+            Parent = artistId,
             Title = musicTrack.FriendlyName,
             IsDir = false,
             Artist = artistName,
             ArtistId = artistId,
-            Album = null, // TODO: Map from album when album entity is implemented
-            AlbumId = null, // TODO: Map from album ID when album entity is implemented
-            CoverArt = "/api/v1/thumbnails/music-track/" + musicTrack.Id + "?type=thumbnail",
+            Album = musicTrack.Album?.Name,
+            AlbumId = musicTrack.AlbumId.ToString(),
+            CoverArt = musicTrack.Id.ToString(),
             // Duration = null, // TODO: Extract duration from audio file metadata
             // BitRate = null, // TODO: Extract bitrate from audio file metadata
             Path = musicTrack.AudioFileLocation,
@@ -41,7 +45,7 @@ public static class SubsonicMappingExtensions
             // Size = null, // TODO: Get file size from audio file
             Created = musicTrack.CreatedAt,
             // Year = null, // TODO: Extract year from metadata
-            // Genre = null, // TODO: Extract genre from metadata
+            Genre = musicTrack.GenreId.ToString(),
             Type = MediaType.Music
         };
     }
@@ -52,9 +56,9 @@ public static class SubsonicMappingExtensions
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
-            CoverArt = null, // TODO: Map from creator thumbnail/image when available
+            CoverArt = creator.Id.ToString(),
             ArtistImageUrl = "/api/v1/thumbnails/creator/" + creator.Id + "?type=thumbnail",
-            AlbumCount = 0 // TODO: Calculate album count when album functionality is implemented
+            AlbumCount = creator.Albums.Count
             // Starred = null // TODO: Implement starring functionality
         };
     }

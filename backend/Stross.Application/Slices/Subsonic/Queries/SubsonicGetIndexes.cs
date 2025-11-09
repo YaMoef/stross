@@ -55,16 +55,17 @@ internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicG
 
         // Build the query for creators
         IQueryable<Creator> creatorsQuery = _context.Creators
-            .Include(c => c.ExternalCreatorMusicTrack)
+            .Include(c => c.ExternalCreators)
             .Include(c => c.MusicTracks);
 
         // Filter by music folder if specified
         if (!string.IsNullOrEmpty(request.Input.MusicFolderId) && int.TryParse(request.Input.MusicFolderId, out int musicFolderId))
             creatorsQuery = creatorsQuery.Where(c =>
-                c.ExternalCreatorMusicTrack.Any(e => e.ProviderId == musicFolderId));
+                c.ExternalCreators.Any(e => e.ProviderId == musicFolderId));
 
         // Get all creators and group them alphabetically
         List<Creator> creators = await creatorsQuery
+            .Include(c => c.Albums)
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken);
 
