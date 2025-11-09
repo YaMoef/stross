@@ -39,6 +39,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool StarredSpecified { get; set; }
         
         /// <summary>
@@ -53,6 +54,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the UserRating property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool UserRatingSpecified { get; set; }
         
         /// <summary>
@@ -67,6 +69,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the AverageRating property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool AverageRatingSpecified { get; set; }
     }
 }

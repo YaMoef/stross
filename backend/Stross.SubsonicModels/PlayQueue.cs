@@ -22,6 +22,7 @@ namespace Stross.SubsonicModels
     {
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _entry;
         
         [System.Xml.Serialization.XmlElementAttribute("entry")]
@@ -41,6 +42,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the Entry collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool EntrySpecified
         {
             get
@@ -65,6 +67,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Current property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool CurrentSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("position")]
@@ -74,6 +77,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Position property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool PositionSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]

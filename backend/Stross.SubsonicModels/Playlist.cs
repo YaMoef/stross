@@ -23,6 +23,7 @@ namespace Stross.SubsonicModels
     {
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<string> _allowedUser;
         
         [System.Xml.Serialization.XmlElementAttribute("allowedUser")]
@@ -42,6 +43,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the AllowedUser collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool AllowedUserSpecified
         {
             get
@@ -80,6 +82,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Public property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool PublicSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]

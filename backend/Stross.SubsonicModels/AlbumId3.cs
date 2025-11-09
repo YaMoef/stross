@@ -54,6 +54,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the PlayCount property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool PlayCountSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
@@ -67,6 +68,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool StarredSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("year")]
@@ -76,6 +78,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Year property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool YearSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("genre")]

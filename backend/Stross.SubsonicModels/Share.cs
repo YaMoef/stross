@@ -22,6 +22,7 @@ namespace Stross.SubsonicModels
     {
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _entry;
         
         [System.Xml.Serialization.XmlElementAttribute("entry")]
@@ -41,6 +42,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the Entry collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool EntrySpecified
         {
             get
@@ -84,6 +86,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Expires property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool ExpiresSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("lastVisited", DataType="dateTime")]
@@ -93,6 +96,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the LastVisited property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool LastVisitedSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]

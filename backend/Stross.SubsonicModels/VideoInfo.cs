@@ -22,6 +22,7 @@ namespace Stross.SubsonicModels
     {
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Captions> _captions;
         
         [System.Xml.Serialization.XmlElementAttribute("captions")]
@@ -41,6 +42,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the Captions collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool CaptionsSpecified
         {
             get
@@ -61,6 +63,7 @@ namespace Stross.SubsonicModels
         }
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<AudioTrack> _audioTrack;
         
         [System.Xml.Serialization.XmlElementAttribute("audioTrack")]
@@ -80,6 +83,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the AudioTrack collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool AudioTrackSpecified
         {
             get
@@ -90,6 +94,7 @@ namespace Stross.SubsonicModels
         }
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<VideoConversion> _conversion;
         
         [System.Xml.Serialization.XmlElementAttribute("conversion")]
@@ -109,6 +114,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the Conversion collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool ConversionSpecified
         {
             get

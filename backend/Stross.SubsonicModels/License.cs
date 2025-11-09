@@ -35,6 +35,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the LicenseExpires property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool LicenseExpiresSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("trialExpires", DataType="dateTime")]
@@ -44,6 +45,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the TrialExpires property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool TrialExpiresSpecified { get; set; }
     }
 }

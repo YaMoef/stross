@@ -32,6 +32,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the BitRate property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool BitRateSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("audioTrackId")]
@@ -41,6 +42,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the AudioTrackId property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool AudioTrackIdSpecified { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace Stross.SubsonicModels
     {
         
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Bookmark> _bookmark;
         
         [System.Xml.Serialization.XmlElementAttribute("bookmark")]
@@ -41,6 +42,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets a value indicating whether the Bookmark collection is empty.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool BookmarkSpecified
         {
             get

@@ -51,6 +51,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Track property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool TrackSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("year")]
@@ -60,6 +61,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Year property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool YearSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("genre")]
@@ -75,6 +77,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Size property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool SizeSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("contentType")]
@@ -96,6 +99,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Duration property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool DurationSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("bitRate")]
@@ -105,6 +109,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the BitRate property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool BitRateSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("path")]
@@ -117,6 +122,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the IsVideo property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool IsVideoSpecified { get; set; }
         
         /// <summary>
@@ -131,6 +137,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the UserRating property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool UserRatingSpecified { get; set; }
         
         /// <summary>
@@ -145,6 +152,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the AverageRating property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool AverageRatingSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("playCount")]
@@ -154,6 +162,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the PlayCount property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool PlayCountSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("discNumber")]
@@ -163,6 +172,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the DiscNumber property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool DiscNumberSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("created", DataType="dateTime")]
@@ -172,6 +182,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Created property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool CreatedSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("starred", DataType="dateTime")]
@@ -181,6 +192,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool StarredSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("albumId")]
@@ -196,6 +208,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the Type property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool TypeSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("bookmarkPosition")]
@@ -205,6 +218,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the BookmarkPosition property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool BookmarkPositionSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("originalWidth")]
@@ -214,6 +228,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the OriginalWidth property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool OriginalWidthSpecified { get; set; }
         
         [System.Xml.Serialization.XmlAttributeAttribute("originalHeight")]
@@ -223,6 +238,7 @@ namespace Stross.SubsonicModels
         /// <para xml:lang="en">Gets or sets a value indicating whether the OriginalHeight property is specified.</para>
         /// </summary>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool OriginalHeightSpecified { get; set; }
     }
 }
