@@ -53,7 +53,7 @@ internal static class SubsonicEndpoints
                 continue;
             }
 
-            Type genericType = property.PropertyType.GetGenericArguments()[0];
+            Type genericType = property.PropertyType.GetGenericArguments().FirstOrDefault() ?? property.PropertyType.GetElementType()!;
             Type collectionType = typeof(ICollection<>).MakeGenericType(genericType);
 
             ParameterExpression param = Expression.Parameter(collectionType, "value");
