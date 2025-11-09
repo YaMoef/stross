@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,6 +10,7 @@ using Stross.Application.Slices.Subsonic.Commands;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Queries;
 using Stross.Application.Slices.Subsonic.ResponseModels;
+using Stross.SubsonicModels.JsonConverters;
 
 namespace Stross.API.Endpoints;
 
@@ -50,6 +52,35 @@ internal static class SubsonicEndpoints
 
             if (!isCollection)
             {
+                continue;
+            }
+
+            // Check for WrappedArrayJsonConverter attribute
+            var wrappedArrayAttr = property.AttributeProvider?.GetCustomAttributes(typeof(WrappedArrayJsonConverterAttribute), false)
+                .OfType<WrappedArrayJsonConverterAttribute>()
+                .FirstOrDefault();
+
+            if (wrappedArrayAttr != null)
+            {
+                // Apply the wrapped array converter
+                Type elementType = property.PropertyType.GetGenericArguments()[0];
+                Type converterType = typeof(WrappedArrayJsonConverterFactory).GetNestedType("WrappedArrayJsonConverterImpl`1", BindingFlags.Public)!
+                    .MakeGenericType(elementType);
+                property.CustomConverter = (JsonConverter?)Activator.CreateInstance(converterType, wrappedArrayAttr.ItemName);
+
+                // Also set ShouldSerialize to only serialize when array has elements
+                Type wrappedCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
+                ParameterExpression wrappedParam = Expression.Parameter(wrappedCollectionType, "value");
+                MemberExpression wrappedCountProperty = Expression.Property(wrappedParam, "Count");
+                var wrappedLambda = Expression.Lambda(
+                    typeof(Func<,>).MakeGenericType(wrappedCollectionType, typeof(int)),
+                    wrappedCountProperty,
+                    wrappedParam);
+                Delegate wrappedGetCount = wrappedLambda.Compile();
+                property.ShouldSerialize = (_, value) =>
+                {
+                    return wrappedGetCount.DynamicInvoke(value) is int count && count > 0;
+                };
                 continue;
             }
 

@@ -11,6 +11,7 @@
 // XmlSchemaClassGenerator.Console https://www.subsonic.org/pages/inc/api/schema/subsonic-rest-api-1.16.1.xsd -o /home/brent/Data/git/private/stross/backend/ --sf --csm Init -n Stross.SubsonicModels --ct System.Collections.Generic.List`1
 
 using System.Text.Json.Serialization;
+using Stross.SubsonicModels.JsonConverters;
 
 namespace Stross.SubsonicModels
 {
@@ -31,6 +32,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("musicFolders")]
         [System.Xml.Serialization.XmlArrayItemAttribute("musicFolder", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("musicFolder")]
         public System.Collections.Generic.List<MusicFolder> MusicFolders
         {
             get
@@ -95,6 +97,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("genres")]
         [System.Xml.Serialization.XmlArrayItemAttribute("genre", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("genre")]
         public System.Collections.Generic.List<Genre> Genres
         {
             get
@@ -139,6 +142,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("videos")]
         [System.Xml.Serialization.XmlArrayItemAttribute("video", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("video")]
         public System.Collections.Generic.List<Child> Videos
         {
             get
@@ -174,6 +178,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("nowPlaying")]
         [System.Xml.Serialization.XmlArrayItemAttribute("entry", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("entry")]
         public System.Collections.Generic.List<NowPlayingEntry> NowPlaying
         {
             get
@@ -215,6 +220,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("playlists")]
         [System.Xml.Serialization.XmlArrayItemAttribute("playlist", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("playlist")]
         public System.Collections.Generic.List<Playlist> Playlists
         {
             get
@@ -259,6 +265,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("users")]
         [System.Xml.Serialization.XmlArrayItemAttribute("user", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("user")]
         public System.Collections.Generic.List<User> Users
         {
             get
@@ -294,6 +301,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("chatMessages")]
         [System.Xml.Serialization.XmlArrayItemAttribute("chatMessage", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("chatMessage")]
         public System.Collections.Generic.List<ChatMessage> ChatMessages
         {
             get
@@ -326,6 +334,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("albumList")]
         [System.Xml.Serialization.XmlArrayItemAttribute("album", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("album")]
         public System.Collections.Generic.List<Child> AlbumList
         {
             get
@@ -358,6 +367,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("albumList2")]
         [System.Xml.Serialization.XmlArrayItemAttribute("album", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("album")]
         public System.Collections.Generic.List<AlbumId3> AlbumList2
         {
             get
@@ -390,6 +400,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("randomSongs")]
         [System.Xml.Serialization.XmlArrayItemAttribute("song", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("song")]
         public System.Collections.Generic.List<Child> RandomSongs
         {
             get
@@ -422,6 +433,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("songsByGenre")]
         [System.Xml.Serialization.XmlArrayItemAttribute("song", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("song")]
         public System.Collections.Generic.List<Child> SongsByGenre
         {
             get
@@ -457,6 +469,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("podcasts")]
         [System.Xml.Serialization.XmlArrayItemAttribute("channel", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("channel")]
         public System.Collections.Generic.List<PodcastChannel> Podcasts
         {
             get
@@ -489,6 +502,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("newestPodcasts")]
         [System.Xml.Serialization.XmlArrayItemAttribute("episode", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("episode")]
         public System.Collections.Generic.List<PodcastEpisode> NewestPodcasts
         {
             get
@@ -521,6 +535,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("internetRadioStations")]
         [System.Xml.Serialization.XmlArrayItemAttribute("internetRadioStation", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("internetRadioStation")]
         public System.Collections.Generic.List<InternetRadioStation> InternetRadioStations
         {
             get
@@ -553,6 +568,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("bookmarks")]
         [System.Xml.Serialization.XmlArrayItemAttribute("bookmark", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("bookmark")]
         public System.Collections.Generic.List<Bookmark> Bookmarks
         {
             get
@@ -588,6 +604,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("shares")]
         [System.Xml.Serialization.XmlArrayItemAttribute("share", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("share")]
         public System.Collections.Generic.List<Share> Shares
         {
             get
@@ -635,6 +652,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("similarSongs")]
         [System.Xml.Serialization.XmlArrayItemAttribute("song", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("song")]
         public System.Collections.Generic.List<Child> SimilarSongs
         {
             get
@@ -667,6 +685,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("similarSongs2")]
         [System.Xml.Serialization.XmlArrayItemAttribute("song", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("song")]
         public System.Collections.Generic.List<Child> SimilarSongs2
         {
             get
@@ -699,6 +718,7 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlArrayAttribute("topSongs")]
         [System.Xml.Serialization.XmlArrayItemAttribute("song", Namespace="http://subsonic.org/restapi")]
+        [WrappedArrayJsonConverter("song")]
         public System.Collections.Generic.List<Child> TopSongs
         {
             get
