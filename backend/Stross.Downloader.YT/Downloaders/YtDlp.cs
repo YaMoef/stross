@@ -59,7 +59,18 @@ public class YtDlp
         _logger.LogInformation("Loading metadata for URL: {SanitizedUrl}", sanitizedUrl);
         YoutubeVideoMetadata videoMetadata = await GetVideoMetaDataAsync(parsedUri.ToString(), cancellationToken);
         string channelId = await GetChannelIdAsync(videoMetadata.AuthorUrl, cancellationToken);
-        await DownloadThumbnailAsync(videoId, fullOutputPathThumbnail, cancellationToken);
+
+        try
+        {
+            await DownloadThumbnailAsync(videoId, fullOutputPathThumbnail, cancellationToken);
+        }
+        catch (YtDlpException ex)
+        {
+            _logger.LogWarning(ex, "Failed to download thumbnail for URL: {SanitizedUrl}", sanitizedUrl);
+
+            relativePathThumbnail = "";
+        }
+
         _logger.LogDebug("Done loading metadata");
 
         _logger.LogInformation("Starting download for URL: {SanitizedUrl} to path: {OutputPathAudio}", sanitizedUrl,
@@ -133,7 +144,7 @@ public class YtDlp
         string html = await youtubeChannelIdHttpClient.GetStringAsync(url, cancellationToken);
 
         Match match = Regex.Match(html,
-            @"https://yt3\.googleusercontent\.com/[A-Za-z0-9\-_]+=s\d+-c-k-c0x00ffffff-no-rj");
+            @"https://yt3\.googleusercontent\.com/(?:ytc/)?[A-Za-z0-9\-_]+=s\d+-c-k-c0x00ffffff-no-rj");
         if (match.Success)
             return match.Value;
 
