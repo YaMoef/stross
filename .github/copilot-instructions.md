@@ -166,6 +166,7 @@ When creating Subsonic commands and queries, always follow these specific patter
 - **Use the `SubsonicBehaviour` pipeline**: This behavior automatically sets the response status, version, and handles exceptions appropriately for Subsonic responses.
 - **Error Handling**: Throw `StrossException` derived exceptions which will be caught by the `SubsonicBehaviour` and converted to proper Subsonic error responses.
 - **ALWAYS use models from `Stross.SubsonicModels` project**: All Subsonic-related data structures, response objects, and API models MUST come from the `Stross.SubsonicModels` project. This project contains auto-generated classes from the official Subsonic API schema and ensures full compliance with the Subsonic specification. Never create custom models that duplicate or replace these official models.
+- **ALWAYS use the documentation**: The subsonic api interface is well documented at https://www.subsonic.org/pages/api.jsp. Always refer to this documentation when implementing Subsonic commands and queries to ensure compliance with the specification.
 
 Example Subsonic command pattern:
 ```csharp
