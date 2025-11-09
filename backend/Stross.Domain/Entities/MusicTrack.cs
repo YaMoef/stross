@@ -13,6 +13,13 @@ public class MusicTrack : BaseEntity
     public Provider? Provider { get; private set; }
     public long ProviderId { get; private set; }
 
+    public Album? Album { get; private set; }
+    public long AlbumId { get; private set; }
+
+    public Genre? Genre { get; private set; }
+    public long GenreId { get; private set; }
+
+
     private readonly List<Creator> _creators = [];
     public IReadOnlyCollection<Creator> Creators => _creators;
 
@@ -23,6 +30,8 @@ public class MusicTrack : BaseEntity
 
     public MusicTrack(
         Provider provider,
+        Album album,
+        Genre genre,
         string audioFileLocation,
         string name,
         string thumbnailLocation,
@@ -31,6 +40,13 @@ public class MusicTrack : BaseEntity
     {
         Provider = provider;
         ProviderId = provider.Id;
+
+        Album = album;
+        AlbumId = album.Id;
+
+        Genre = genre;
+        GenreId = genre.Id;
+
         _creators.AddRange(creators);
 
         AudioFileLocation = audioFileLocation;
