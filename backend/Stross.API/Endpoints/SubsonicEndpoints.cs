@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using MediatR;
 using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.Subsonic.Commands;
@@ -19,8 +21,54 @@ internal static class SubsonicEndpoints
         {
             new JsonStringEnumConverter()
         },
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        
+        // https://github.com/dotnet/runtime/issues/108237
+        TypeInfoResolverChain = { new DefaultJsonTypeInfoResolver().WithAddedModifier(ContractModifier_Collection) }
     };
+
+    private static void ContractModifier_Collection(JsonTypeInfo jsonTypeInfo)
+    {
+        if (jsonTypeInfo.Kind != JsonTypeInfoKind.Object)
+        {
+            return;
+        }
+
+        foreach (var property in jsonTypeInfo.Properties)
+        {
+            if (property.PropertyType.IsValueType)
+            {
+                continue;
+            }
+
+            bool isCollection =
+                (property.PropertyType.IsGenericType
+                 && property.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+                || Array.Exists(
+                    property.PropertyType.GetInterfaces(),
+                    i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICollection<>));
+
+            if (!isCollection)
+            {
+                continue;
+            }
+
+            Type genericType = property.PropertyType.GetGenericArguments()[0];
+            Type collectionType = typeof(ICollection<>).MakeGenericType(genericType);
+
+            ParameterExpression param = Expression.Parameter(collectionType, "value");
+            MemberExpression countProperty = Expression.Property(param, "Count");
+            var lambda = Expression.Lambda(
+                typeof(Func<,>).MakeGenericType(collectionType, typeof(int)),
+                countProperty,
+                param);
+            Delegate getCount = lambda.Compile();
+            property.ShouldSerialize = (_, value) =>
+            {
+                return getCount.DynamicInvoke(value) is int count && count > 0;
+            };
+        }
+    }
 
     private static IResult CreateSubsonicResult(SubsonicBaseResponse response)
     {
