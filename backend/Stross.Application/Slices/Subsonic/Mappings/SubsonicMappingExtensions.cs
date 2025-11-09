@@ -94,6 +94,79 @@ public static class SubsonicMappingExtensions
         };
     }
 
+    public static ArtistWithAlbumsId3 ToSubsonicArtistWithAlbumsResponse(this Creator creator)
+    {
+        return new ArtistWithAlbumsId3
+        {
+            Id = creator.Id.ToString(),
+            Name = creator.Name,
+            ArtistImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=thumbnail",
+            CoverArt = creator.Id.ToString(),
+            AlbumCount = creator.Albums.Count,
+            Album = creator.Albums.Select(a => a.ToSubsonicAlbumId3Response()).ToList()
+            // Starred = null // TODO: Implement starring functionality
+        };
+    }
+
+    public static AlbumId3 ToSubsonicAlbumId3Response(this Album album)
+    {
+        Creator? primaryCreator = album.Creators.FirstOrDefault();
+
+        return new AlbumId3
+        {
+            Id = album.Id.ToString(),
+            Name = album.Name,
+            Artist = primaryCreator?.Name,
+            ArtistId = primaryCreator?.Id.ToString(),
+            CoverArt = album.Id.ToString(),
+            SongCount = album.MusicTracks.Count,
+            // Duration = 0, // TODO: Calculate total duration from tracks
+            Created = album.CreatedAt,
+            // Year = null, // TODO: Extract year from album metadata
+            Genre = album.Genre!.Name // TODO: Extract genre from album metadata
+        };
+    }
+
+    public static AlbumWithSongsId3 ToSubsonicAlbumWithSongsResponse(this Album album)
+    {
+        Creator? primaryCreator = album.Creators.FirstOrDefault();
+
+        return new AlbumWithSongsId3
+        {
+            Id = album.Id.ToString(),
+            Name = album.Name,
+            Artist = primaryCreator?.Name,
+            ArtistId = primaryCreator?.Id.ToString(),
+            CoverArt = album.Id.ToString(),
+            SongCount = album.MusicTracks.Count,
+            Duration = 0, // TODO: Calculate total duration from tracks
+            Created = album.CreatedAt,
+            Song = album.MusicTracks.Select(t => t.ToSubsonicSongResponse()).ToList(),
+            // Year = null, // TODO: Extract year from album metadata
+            Genre = album.Genre!.Name
+        };
+    }
+
+    public static Child ToSubsonicAlbumListResponse(this Album album)
+    {
+        Creator? primaryCreator = album.Creators.FirstOrDefault();
+
+        return new Child
+        {
+            Id = album.Id.ToString(),
+            Title = album.Name,
+            Album = album.Name,
+            Artist = primaryCreator?.Name,
+            ArtistId = primaryCreator?.Id.ToString(),
+            IsDir = true, // Albums are directories in album list context
+            CoverArt = album.Id.ToString(),
+            Created = album.CreatedAt,
+            // Year = null, // TODO: Extract year from album metadata
+            Genre = album.Genre?.Name,
+            Type = MediaType.Music
+        };
+    }
+
     private static string? GetContentTypeFromExtension(string? extension)
     {
         return extension?.ToLowerInvariant() switch

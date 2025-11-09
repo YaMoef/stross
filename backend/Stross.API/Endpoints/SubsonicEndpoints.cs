@@ -157,6 +157,58 @@ internal static class SubsonicEndpoints
             .WithSummary("Returns an indexed structure of all artists organized by ID3 tags")
             .WithOpenApi();
 
+        // GetArtist endpoint - returns details for an artist, including a list of albums (GET /subsonic/rest/getArtist)
+        subsonicGroup.MapGet("getArtist",
+                async ([AsParameters]SubsonicGetArtistInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetArtistQuery query = new SubsonicGetArtistQuery(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetArtist")
+            .WithSummary("Returns details for an artist, including a list of albums")
+            .WithOpenApi();
+
+        // GetAlbum endpoint - returns details for an album, including a list of songs (GET /subsonic/rest/getAlbum)
+        subsonicGroup.MapGet("getAlbum",
+                async ([AsParameters]SubsonicGetAlbumInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetAlbumQuery query = new SubsonicGetAlbumQuery(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetAlbum")
+            .WithSummary("Returns details for an album, including a list of songs")
+            .WithOpenApi();
+
+        // GetArtistInfo endpoint - returns artist info with biography, image URLs and similar artists (GET /subsonic/rest/getArtistInfo)
+        subsonicGroup.MapGet("getArtistInfo",
+                async ([AsParameters]SubsonicGetArtistInfoInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetArtistInfoQuery query = new SubsonicGetArtistInfoQuery(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetArtistInfo")
+            .WithSummary("Returns artist info with biography, image URLs and similar artists")
+            .WithOpenApi();
+
+        // GetArtistInfo2 endpoint - similar to getArtistInfo but organizes music according to ID3 tags (GET /subsonic/rest/getArtistInfo2)
+        subsonicGroup.MapGet("getArtistInfo2",
+                async ([AsParameters]SubsonicGetArtistInfo2Input input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetArtistInfo2Query query = new SubsonicGetArtistInfo2Query(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetArtistInfo2")
+            .WithSummary("Returns artist info with biography, image URLs and similar artists organized by ID3 tags")
+            .WithOpenApi();
+
         // GetPlaylists endpoint - returns all playlists (GET /subsonic/rest/getPlaylists)
         subsonicGroup.MapGet("getPlaylists",
                 async ([AsParameters]SubsonicGetPlaylistsInput input, IMediator sender, CancellationToken cancellationToken) =>
@@ -168,6 +220,32 @@ internal static class SubsonicEndpoints
                 })
             .WithName("SubsonicGetPlaylists")
             .WithSummary("Returns all playlists")
+            .WithOpenApi();
+
+        // GetAlbumList endpoint - returns a list of albums based on various criteria (GET /subsonic/rest/getAlbumList)
+        subsonicGroup.MapGet("getAlbumList",
+                async ([AsParameters]SubsonicGetAlbumListInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetAlbumListQuery query = new SubsonicGetAlbumListQuery(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetAlbumList")
+            .WithSummary("Returns a list of albums based on various criteria")
+            .WithOpenApi();
+
+        // GetAlbumList2 endpoint - similar to getAlbumList, but organizes music according to ID3 tags (GET /subsonic/rest/getAlbumList2)
+        subsonicGroup.MapGet("getAlbumList2",
+                async ([AsParameters]SubsonicGetAlbumList2Input input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetAlbumList2Query query = new SubsonicGetAlbumList2Query(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetAlbumList2")
+            .WithSummary("Returns a list of albums based on various criteria, organized according to ID3 tags")
             .WithOpenApi();
 
         // GetBookmarks endpoint - returns all bookmarks (GET /subsonic/rest/getBookmarks)
@@ -276,6 +354,28 @@ internal static class SubsonicEndpoints
             .WithSummary("Downloads audio files for a song")
             .WithOpenApi()
             .Produces(200)
+            .Produces(404)
+            .ProducesValidationProblem();
+
+        // GetCoverArt endpoint - returns cover art images (GET /subsonic/rest/getCoverArt)
+        subsonicGroup.MapGet("getCoverArt",
+                async ([AsParameters]SubsonicGetCoverArtInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetCoverArtQuery query = new SubsonicGetCoverArtQuery(input);
+                    SubsonicGetCoverArtResponse result = await sender.Send(query, cancellationToken);
+
+                    if (!File.Exists(result.FilePath))
+                        return Results.NotFound("Cover art image not found on disk");
+
+                    byte[] fileBytes = await File.ReadAllBytesAsync(result.FilePath, cancellationToken);
+
+                    return Results.File(fileBytes, result.ContentType, result.FileName);
+                })
+            .WithName("SubsonicGetCoverArt")
+            .WithSummary("Returns cover art images for songs, albums, or artists")
+            .WithOpenApi()
+            .Produces(200, contentType:"image/jpeg")
+            .Produces(200, contentType:"image/png")
             .Produces(404)
             .ProducesValidationProblem();
 
