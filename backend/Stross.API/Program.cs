@@ -11,7 +11,6 @@ using Stross.Application.Slices.Subsonic;
 using Stross.Application.Slices.Thumbnail;
 using Stross.Config;
 using Stross.Infrastructure;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

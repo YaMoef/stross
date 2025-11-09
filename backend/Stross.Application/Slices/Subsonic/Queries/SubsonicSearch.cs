@@ -65,7 +65,6 @@ internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearc
             .Take(request.Input.Count)
             .ToListAsync(cancellationToken);
 
-
         Response response = new Response
         {
             SearchResult = new SearchResult
