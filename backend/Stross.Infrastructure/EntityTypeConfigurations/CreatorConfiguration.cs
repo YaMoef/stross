@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Stross.Domain.Entities;
 
 namespace Stross.Infrastructure.EntityTypeConfigurations;
 
-public class CreatorConfiguration : BaseEntityConfiguration<Creator>
+public sealed class CreatorConfiguration : BaseEntityConfiguration<Creator>
 {
     public static readonly int NameMaxLength = 255;
 
@@ -12,12 +13,18 @@ public class CreatorConfiguration : BaseEntityConfiguration<Creator>
     {
         builder.ToTable("Creators");
 
+        // Configure ID to use shared sequence
+        builder.Property(x => x.Id)
+            .ValueGeneratedOnAdd()
+            .HasDefaultValueSql("nextval('shared_entity_id_seq')")
+            .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(NameMaxLength);
 
-        // One-to-many relationship with ExternalCreatorMusicTrack
-        builder.HasMany(x => x.ExternalCreatorMusicTrack)
+        // One-to-many relationship with ExternalCreators
+        builder.HasMany(x => x.ExternalCreators)
             .WithOne(x => x.Creator)
             .HasForeignKey(x => x.CreatorId)
             .OnDelete(DeleteBehavior.Cascade);

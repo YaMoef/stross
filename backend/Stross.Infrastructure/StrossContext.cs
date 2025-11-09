@@ -18,8 +18,23 @@ public class StrossContext : DbContext
         base.OnConfiguring(optionsBuilder);
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.HasSequence<long>("shared_entity_id_seq")
+            .StartsAt(10)
+            .IncrementsBy(1);
+
+        // Apply all entity configurations from this assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(StrossContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+    }
+
     public DbSet<Creator> Creators { get; init; }
-    public DbSet<ExternalCreatorMusicTrack> ExternalCreatorMusicTracks { get; init; }
+    public DbSet<ExternalCreator> ExternalCreators { get; init; }
     public DbSet<MusicTrack> MusicTracks { get; init; }
     public DbSet<Provider> Providers { get; init; }
+    public DbSet<Genre> Genres { get; init; }
+    public DbSet<Album> Albums { get; init; }
+    public DbSet<ExternalAlbum> ExternalAlbums { get; init; }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Stross.Domain.Seedwork;
 
 namespace Stross.Infrastructure.EntityTypeConfigurations;
@@ -12,8 +13,7 @@ public abstract class BaseEntityConfiguration<TEntity> : IEntityTypeConfiguratio
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.Id)
-            .IsRequired()
-            .ValueGeneratedOnAdd();
+            .IsRequired();
 
         builder.Property(x => x.CreatedAt)
             .IsRequired();
