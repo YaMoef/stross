@@ -9,6 +9,8 @@ public class MusicTrack : BaseEntity
     public string FriendlyName { get; private set; }
     public string ThumbnailLocation { get; private set; }
     public string ExternalUrl { get; private set; }
+    public int Duration { get; private set; }
+    public long Size { get; private set; }
 
     public Provider? Provider { get; private set; }
     public long ProviderId { get; private set; }
@@ -36,7 +38,9 @@ public class MusicTrack : BaseEntity
         string name,
         string thumbnailLocation,
         IReadOnlyCollection<Creator> creators,
-        string externalUrl)
+        string externalUrl,
+        int duration,
+        long size)
     {
         Provider = provider;
         ProviderId = provider.Id;
@@ -54,5 +58,7 @@ public class MusicTrack : BaseEntity
         FriendlyName = name;
         ThumbnailLocation = thumbnailLocation;
         ExternalUrl = externalUrl;
+        Duration = duration;
+        Size = size;
     }
 }
