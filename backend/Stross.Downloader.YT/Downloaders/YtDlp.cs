@@ -31,7 +31,6 @@ public class YtDlp
     public async Task<MusicTrackMetadata> DownloadMusicTrack(string sourceUrl, string targetLocationPath,
         CancellationToken cancellationToken = default)
     {
-        Uri parsedUri = new Uri(sourceUrl);
         string relativeStartPath = Path.Combine("music-tracks", targetLocationPath);
         string fullStartPath = Path.Combine(_config.OutputPath, relativeStartPath);
 
@@ -44,25 +43,15 @@ public class YtDlp
         if (!Path.Exists(fullStartPath))
             Directory.CreateDirectory(fullStartPath);
 
-        NameValueCollection parsed =
-            HttpUtility.ParseQueryString(parsedUri.Query.Split('?').Skip(1).FirstOrDefault() ?? "");
-
-        string videoId;
-
-        if (parsed.AllKeys.Contains("v") && !string.IsNullOrEmpty(parsed["v"]))
-            videoId = parsed["v"]!;
-        else
-            throw new YtDlpException("Video ID not found in URL");
-
-        string sanitizedUrl = $"https://www.youtube.com/watch?v={videoId}";
+        string sanitizedUrl = SanitizeYoutubeUrl(sourceUrl);
 
         _logger.LogInformation("Loading metadata for URL: {SanitizedUrl}", sanitizedUrl);
-        YoutubeVideoMetadata videoMetadata = await GetVideoMetaDataAsync(parsedUri.ToString(), cancellationToken);
+        YoutubeVideoMetadata videoMetadata = await GetVideoMetaDataAsync(sanitizedUrl, cancellationToken);
         string channelId = await GetChannelIdAsync(videoMetadata.AuthorUrl, cancellationToken);
 
         try
         {
-            await DownloadThumbnailAsync(videoId, fullOutputPathThumbnail, cancellationToken);
+            await DownloadThumbnailAsync(sanitizedUrl, fullOutputPathThumbnail, cancellationToken);
         }
         catch (YtDlpException ex)
         {
@@ -75,7 +64,7 @@ public class YtDlp
 
         _logger.LogInformation("Starting download for URL: {SanitizedUrl} to path: {OutputPathAudio}", sanitizedUrl,
             fullOutputPathAudio);
-        _youtubeDlp.VideoUrl = parsedUri.ToString();
+        _youtubeDlp.VideoUrl = sanitizedUrl;
         _youtubeDlp.Options.FilesystemOptions.Output = fullOutputPathAudio;
         _youtubeDlp.Options.PostProcessingOptions.ExtractAudio = true;
         _youtubeDlp.YoutubeDlPath = _config.YtDlpPath;
@@ -94,7 +83,7 @@ public class YtDlp
             throw new YtDlpException(error);
         }
 
-        if(!File.Exists(fullOutputPathAudio))
+        if (!File.Exists(fullOutputPathAudio))
             throw new YtDlpException("Audio file not found after download");
 
         _logger.LogDebug("Download completed successfully for URL: {SanitizedUrl}", sanitizedUrl);
@@ -229,5 +218,55 @@ public class YtDlp
 
             throw new YtDlpException($"Failed to get channel ID: {ex.Message}");
         }
+    }
+
+    internal static string SanitizeYoutubeUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new YtDlpException("URL cannot be null or empty");
+
+        Uri parsedUri;
+
+        try
+        {
+            parsedUri = new Uri(url);
+        }
+        catch (UriFormatException)
+        {
+            throw new YtDlpException("Invalid URL format");
+        }
+
+        // Validate that it's a YouTube URL
+        string host = parsedUri.Host.ToLowerInvariant();
+
+        if (host != "www.youtube.com" && host != "youtube.com" && host != "youtu.be" && host != "m.youtube.com")
+            throw new YtDlpException("URL is not a valid YouTube URL");
+
+        string videoId;
+
+        // Handle youtu.be short links
+        if (host == "youtu.be")
+        {
+            videoId = parsedUri.AbsolutePath.TrimStart('/').Split('/')[0];
+            if (string.IsNullOrEmpty(videoId))
+                throw new YtDlpException("Video ID not found in URL");
+        }
+        else
+        {
+            // Handle standard YouTube URLs
+            NameValueCollection parsed =
+                HttpUtility.ParseQueryString(parsedUri.Query.Split('?').Skip(1).FirstOrDefault() ?? "");
+
+            if (parsed.AllKeys.Contains("v") && !string.IsNullOrEmpty(parsed["v"]))
+                videoId = parsed["v"]!;
+            else
+                throw new YtDlpException("Video ID not found in URL");
+        }
+
+        // Validate video ID format (YouTube video IDs are typically 11 characters)
+        if (string.IsNullOrWhiteSpace(videoId) || videoId.Length != 11 || !Regex.IsMatch(videoId, @"^[a-zA-Z0-9_-]+$"))
+            throw new YtDlpException("Invalid YouTube video ID format");
+
+        return $"https://www.youtube.com/watch?v={videoId}";
     }
 }

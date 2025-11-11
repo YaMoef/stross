@@ -56,7 +56,7 @@ public class GrpcService : IGrpcService
             using GrpcChannel channel = GrpcChannel.ForAddress(providerUrl);
             Downloader.DownloaderClient client = new Downloader.DownloaderClient(channel);
 
-            PingReply reply = await client.PingAsync(new PingRequest());
+            PingReply reply = await client.PingAsync(new PingRequest(), cancellationToken:cancellationToken);
 
             return reply.Ready;
         }
@@ -71,5 +71,21 @@ public class GrpcService : IGrpcService
     public Task<bool> PingAsync(Provider provider, CancellationToken cancellationToken = default)
     {
         return PingAsync(provider.Url, cancellationToken);
+    }
+
+    public async Task<string> GetSanitizedSourceUrlAsync(string sourceUrl, Provider providerToUse, CancellationToken cancellationToken = default)
+    {
+        using GrpcChannel channel = GrpcChannel.ForAddress(providerToUse.Url);
+        Downloader.DownloaderClient client = new Downloader.DownloaderClient(channel);
+
+        SanitizeSourceUrlReply reply = await client.SanitizeSourceUrlAsync(new SanitizeSourceUrlRequest
+        {
+            SourceUrl = sourceUrl
+        }, cancellationToken:cancellationToken);
+
+        if (reply.Error == "Invalid URL provided.")
+            throw new ValidationException(reply.Error);
+
+        return reply.SanitizedUrl;
     }
 }

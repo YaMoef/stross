@@ -6,6 +6,7 @@ service Downloader {
   rpc DownloadMusicTrack (DownloadMusicTrackRequest) returns (DownloadMusicTrackReply);
   rpc GetCreatorMetadata (GetCreatorMetadataRequest) returns (GetCreatorMetadataReply);
   rpc Ping (PingRequest) returns (PingReply);
+  rpc SanitizeSourceUrl (SanitizeSourceUrlRequest) returns (SanitizeSourceUrlReply);
 }
 
 message DownloadMusicTrackRequest {
@@ -44,4 +45,15 @@ message PingRequest {
 
 message PingReply {
   bool ready = 1;
+}
+
+message SanitizeSourceUrlRequest {
+  string sourceUrl = 1;
+}
+
+message SanitizeSourceUrlReply {
+  bool succeeded = 1;
+  string error = 2;
+
+  string sanitizedUrl = 3;
 }

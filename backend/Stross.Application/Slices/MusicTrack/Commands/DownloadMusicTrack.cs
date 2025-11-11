@@ -38,7 +38,8 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
     private readonly IThumbnailService _thumbnailService;
     private readonly IAudioFileMetadataService _audioFileMetadataService;
 
-    public DownloadMusicTrackCommandHandler(StrossContext context, IGrpcService grpcService, IOptionsSnapshot<StrossStorageConfig> storageConfigSnapshot, IThumbnailService thumbnailService, IAudioFileMetadataService audioFileMetadataService)
+    public DownloadMusicTrackCommandHandler(StrossContext context, IGrpcService grpcService, IOptionsSnapshot<StrossStorageConfig> storageConfigSnapshot, IThumbnailService thumbnailService,
+        IAudioFileMetadataService audioFileMetadataService)
     {
         _context = context;
         _grpcService = grpcService;
@@ -49,16 +50,6 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
 
     public async Task<long> Handle(DownloadMusicTrackCommand request, CancellationToken cancellationToken)
     {
-        string sanitizedUrl = request.Input.SourceUrl.SanitizeString() ?? throw new ValidationException(nameof(request.Input.SourceUrl), "Source URL is required.");
-
-        Genre unknownGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == Constants.UnknownName, cancellationToken) ??
-                             throw new EntityNotFoundException(nameof(Genre));
-
-        Domain.Entities.MusicTrack? musicTrackInDb = await _context.MusicTracks.FirstOrDefaultAsync(m => m.ExternalUrl.ToLower() == sanitizedUrl.ToLower(), cancellationToken);
-
-        if (musicTrackInDb is not null)
-            throw new StrossException("This music track has already been downloaded.");
-
         Domain.Entities.Provider? providerToUse =
             await _context.Providers.FirstOrDefaultAsync(p => p.Id == request.Input.ProviderId, cancellationToken);
 
@@ -67,6 +58,16 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
 
         if (!providerToUse.Enabled)
             throw new ProviderException("This provider is not enabled.");
+
+        string sanitizedUrl = await _grpcService.GetSanitizedSourceUrlAsync(request.Input.SourceUrl, providerToUse, cancellationToken);
+
+        Genre unknownGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == Constants.UnknownName, cancellationToken) ??
+                             throw new EntityNotFoundException(nameof(Genre));
+
+        Domain.Entities.MusicTrack? musicTrackInDb = await _context.MusicTracks.FirstOrDefaultAsync(m => m.ExternalUrl.ToLower() == sanitizedUrl.ToLower(), cancellationToken);
+
+        if (musicTrackInDb is not null)
+            throw new StrossException("This music track has already been downloaded.");
 
         DownloadedMusicTrack downloadedMusicTrack =
             await _grpcService.DownloadMusicTrackAsync(sanitizedUrl, providerToUse, cancellationToken);

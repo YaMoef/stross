@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Stross.Downloader.YT.Downloaders;
+using Stross.Downloader.YT.Exceptions;
 using Stross.Downloader.YT.Models;
 using Stross.Proto;
 
@@ -89,5 +90,26 @@ public class YtDlpService : Proto.Downloader.DownloaderBase
         {
             Ready = true
         });
+    }
+
+    public override Task<SanitizeSourceUrlReply> SanitizeSourceUrl(SanitizeSourceUrlRequest request, ServerCallContext context)
+    {
+        try
+        {
+            return Task.FromResult(new SanitizeSourceUrlReply
+            {
+                SanitizedUrl = YtDlp.SanitizeYoutubeUrl(request.SourceUrl)
+            });
+        }
+        catch (YtDlpException ex)
+        {
+            _logger.LogWarning(ex, "Invalid URL provided.");
+
+            return Task.FromResult(new SanitizeSourceUrlReply
+            {
+                Succeeded = false,
+                Error = "Invalid URL provided."
+            });
+        }
     }
 }
