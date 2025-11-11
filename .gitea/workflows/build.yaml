@@ -20,13 +20,31 @@ jobs:
           username: "${{ secrets.DOCKER_DEFAULT_REGISTRY_USERNAME }}"
           password: "${{ secrets.DOCKER_DEFAULT_REGISTRY_PASSWORD }}"
 
+      - name: Extract tag name
+        shell: bash
+        run: |
+          echo "$GITHUB_REF_NAME"
+
+          pattern="(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"
+
+          version=$(echo "$GITHUB_REF_NAME" | grep -oP "$pattern" || echo "" )
+
+          if [ -n "$version" ]; then
+            echo "has version"
+            echo "tag=$version" >> $GITHUB_OUTPUT
+          else
+            echo "has no version"
+            echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+        id: extract_tag
+
       - name: Build and push API Docker image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Stross.API/Dockerfile
           push: true
-          tags: "${{ vars.DOCKER_API_REPOSITORY }}:dev"
+          tags: "${{ vars.DOCKER_API_REPOSITORY }}:${{ steps.extract_tag.outputs.tag }}"
 
       - name: Build and push downloader yt Docker image
         uses: docker/build-push-action@v6
@@ -34,10 +52,10 @@ jobs:
           context: ./backend
           file: ./backend/Stross.Downloader.YT/Dockerfile
           push: true
-          tags: "${{ vars.DOCKER_DOWNLOADER_YT_REPOSITORY }}:dev"
+          tags: "${{ vars.DOCKER_DOWNLOADER_YT_REPOSITORY }}:${{ steps.extract_tag.outputs.tag }}"
 
       - name: Get ssh host key for gitea
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts && touch ~/.ssh/id_ed25519
@@ -46,7 +64,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Update deployment repository
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           git clone "${{ vars.DEPLOYMENT_REPO_URL }}" deployment-repo
@@ -66,7 +84,7 @@ jobs:
           git push
 
       - name: Send webhook notification
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           curl -k -X POST "${{ secrets.WEBHOOK_URL }}"
