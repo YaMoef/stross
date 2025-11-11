@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _share = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Share collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ShareSpecified
-        {
-            get
-            {
-                return ((this.Share != null) 
-                            && (this.Share.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Shares" /> class.</para>
         /// </summary>

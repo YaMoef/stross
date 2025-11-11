@@ -39,19 +39,6 @@ namespace Stross.SubsonicModels
             }
         }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the AllowedUser collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AllowedUserSpecified
-        {
-            get
-            {
-                return ((this.AllowedUser != null) 
-                            && (this.AllowedUser.Count != 0));
-            }
-        }
         
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Playlist" /> class.</para>
@@ -77,13 +64,6 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlAttributeAttribute("public")]
         public bool Public { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Public property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PublicSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("songCount")]

@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _match = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Match collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool MatchSpecified
-        {
-            get
-            {
-                return ((this.Match != null) 
-                            && (this.Match.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="SearchResult" /> class.</para>
         /// </summary>

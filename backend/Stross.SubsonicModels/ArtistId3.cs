@@ -42,12 +42,5 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlAttributeAttribute("starred", DataType="dateTime")]
         public System.DateTime Starred { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool StarredSpecified { get; set; }
     }
 }

@@ -44,21 +44,7 @@ namespace Stross.SubsonicModels
                 _musicFolders = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the MusicFolders collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool MusicFoldersSpecified
-        {
-            get
-            {
-                return ((this.MusicFolders != null) 
-                            && (this.MusicFolders.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Response" /> class.</para>
         /// </summary>
@@ -109,21 +95,7 @@ namespace Stross.SubsonicModels
                 _genres = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Genres collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool GenresSpecified
-        {
-            get
-            {
-                return ((this.Genres != null) 
-                            && (this.Genres.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("artists")]
         public ArtistsId3 Artists { get; set; }
         
@@ -154,21 +126,7 @@ namespace Stross.SubsonicModels
                 _videos = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Videos collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool VideosSpecified
-        {
-            get
-            {
-                return ((this.Videos != null) 
-                            && (this.Videos.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("videoInfo")]
         public VideoInfo VideoInfo { get; set; }
         
@@ -190,21 +148,7 @@ namespace Stross.SubsonicModels
                 _nowPlaying = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the NowPlaying collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool NowPlayingSpecified
-        {
-            get
-            {
-                return ((this.NowPlaying != null) 
-                            && (this.NowPlaying.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("searchResult")]
         public SearchResult SearchResult { get; set; }
         
@@ -232,21 +176,7 @@ namespace Stross.SubsonicModels
                 _playlists = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Playlists collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PlaylistsSpecified
-        {
-            get
-            {
-                return ((this.Playlists != null) 
-                            && (this.Playlists.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("playlist")]
         public PlaylistWithSongs Playlist { get; set; }
         
@@ -277,21 +207,7 @@ namespace Stross.SubsonicModels
                 _users = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Users collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool UsersSpecified
-        {
-            get
-            {
-                return ((this.Users != null) 
-                            && (this.Users.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("user")]
         public User User { get; set; }
         
@@ -313,21 +229,7 @@ namespace Stross.SubsonicModels
                 _chatMessages = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the ChatMessages collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ChatMessagesSpecified
-        {
-            get
-            {
-                return ((this.ChatMessages != null) 
-                            && (this.ChatMessages.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _albumList;
@@ -346,21 +248,7 @@ namespace Stross.SubsonicModels
                 _albumList = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the AlbumList collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AlbumListSpecified
-        {
-            get
-            {
-                return ((this.AlbumList != null) 
-                            && (this.AlbumList.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<AlbumId3> _albumList2;
@@ -379,21 +267,7 @@ namespace Stross.SubsonicModels
                 _albumList2 = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the AlbumList2 collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AlbumList2Specified
-        {
-            get
-            {
-                return ((this.AlbumList2 != null) 
-                            && (this.AlbumList2.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _randomSongs;
@@ -412,21 +286,7 @@ namespace Stross.SubsonicModels
                 _randomSongs = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the RandomSongs collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool RandomSongsSpecified
-        {
-            get
-            {
-                return ((this.RandomSongs != null) 
-                            && (this.RandomSongs.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _songsByGenre;
@@ -445,21 +305,7 @@ namespace Stross.SubsonicModels
                 _songsByGenre = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the SongsByGenre collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SongsByGenreSpecified
-        {
-            get
-            {
-                return ((this.SongsByGenre != null) 
-                            && (this.SongsByGenre.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("lyrics")]
         public Lyrics Lyrics { get; set; }
         
@@ -481,21 +327,7 @@ namespace Stross.SubsonicModels
                 _podcasts = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Podcasts collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PodcastsSpecified
-        {
-            get
-            {
-                return ((this.Podcasts != null) 
-                            && (this.Podcasts.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<PodcastEpisode> _newestPodcasts;
@@ -514,21 +346,7 @@ namespace Stross.SubsonicModels
                 _newestPodcasts = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the NewestPodcasts collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool NewestPodcastsSpecified
-        {
-            get
-            {
-                return ((this.NewestPodcasts != null) 
-                            && (this.NewestPodcasts.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<InternetRadioStation> _internetRadioStations;
@@ -547,21 +365,7 @@ namespace Stross.SubsonicModels
                 _internetRadioStations = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the InternetRadioStations collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool InternetRadioStationsSpecified
-        {
-            get
-            {
-                return ((this.InternetRadioStations != null) 
-                            && (this.InternetRadioStations.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Bookmark> _bookmarks;
@@ -580,21 +384,7 @@ namespace Stross.SubsonicModels
                 _bookmarks = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Bookmarks collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool BookmarksSpecified
-        {
-            get
-            {
-                return ((this.Bookmarks != null) 
-                            && (this.Bookmarks.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("playQueue")]
         public PlayQueue PlayQueue { get; set; }
         
@@ -616,21 +406,7 @@ namespace Stross.SubsonicModels
                 _shares = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Shares collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SharesSpecified
-        {
-            get
-            {
-                return ((this.Shares != null) 
-                            && (this.Shares.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("starred")]
         public Starred Starred { get; set; }
         
@@ -664,21 +440,7 @@ namespace Stross.SubsonicModels
                 _similarSongs = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the SimilarSongs collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SimilarSongsSpecified
-        {
-            get
-            {
-                return ((this.SimilarSongs != null) 
-                            && (this.SimilarSongs.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _similarSongs2;
@@ -697,21 +459,7 @@ namespace Stross.SubsonicModels
                 _similarSongs2 = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the SimilarSongs2 collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SimilarSongs2Specified
-        {
-            get
-            {
-                return ((this.SimilarSongs2 != null) 
-                            && (this.SimilarSongs2.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _topSongs;
@@ -730,21 +478,7 @@ namespace Stross.SubsonicModels
                 _topSongs = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the TopSongs collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool TopSongsSpecified
-        {
-            get
-            {
-                return ((this.TopSongs != null) 
-                            && (this.TopSongs.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlElementAttribute("scanStatus")]
         public ScanStatus ScanStatus { get; set; }
         

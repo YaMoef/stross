@@ -38,19 +38,6 @@ namespace Stross.SubsonicModels
             }
         }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Child collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ChildSpecified
-        {
-            get
-            {
-                return ((this.Child != null) 
-                            && (this.Child.Count != 0));
-            }
-        }
         
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Directory" /> class.</para>
@@ -75,26 +62,12 @@ namespace Stross.SubsonicModels
         public System.DateTime Starred { get; set; }
         
         /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool StarredSpecified { get; set; }
-        
-        /// <summary>
         /// <para xml:lang="en">Minimum inclusive value: 1.</para>
         /// <para xml:lang="en">Maximum inclusive value: 5.</para>
         /// </summary>
         [System.ComponentModel.DataAnnotations.RangeAttribute(typeof(int), "1", "5")]
         [System.Xml.Serialization.XmlAttributeAttribute("userRating")]
         public int UserRating { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the UserRating property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool UserRatingSpecified { get; set; }
         
         /// <summary>
         /// <para xml:lang="en">Minimum inclusive value: 1.0.</para>
@@ -104,21 +77,7 @@ namespace Stross.SubsonicModels
         [System.Xml.Serialization.XmlAttributeAttribute("averageRating")]
         public double AverageRating { get; set; }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the AverageRating property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AverageRatingSpecified { get; set; }
-        
         [System.Xml.Serialization.XmlAttributeAttribute("playCount")]
         public long PlayCount { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the PlayCount property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PlayCountSpecified { get; set; }
     }
 }

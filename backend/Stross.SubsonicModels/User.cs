@@ -38,19 +38,6 @@ namespace Stross.SubsonicModels
             }
         }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Folder collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool FolderSpecified
-        {
-            get
-            {
-                return ((this.Folder != null) 
-                            && (this.Folder.Count != 0));
-            }
-        }
         
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="User" /> class.</para>
@@ -73,13 +60,6 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlAttributeAttribute("maxBitRate")]
         public int MaxBitRate { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the MaxBitRate property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool MaxBitRateSpecified { get; set; }
         
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("adminRole")]
@@ -131,12 +111,5 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlAttributeAttribute("avatarLastChanged", DataType="dateTime")]
         public System.DateTime AvatarLastChanged { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the AvatarLastChanged property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AvatarLastChangedSpecified { get; set; }
     }
 }

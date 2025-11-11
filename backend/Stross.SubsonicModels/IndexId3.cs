@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _artist = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Artist collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ArtistSpecified
-        {
-            get
-            {
-                return ((this.Artist != null) 
-                            && (this.Artist.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="IndexId3" /> class.</para>
         /// </summary>

@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _user = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the User collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool UserSpecified
-        {
-            get
-            {
-                return ((this.User != null) 
-                            && (this.User.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Users" /> class.</para>
         /// </summary>

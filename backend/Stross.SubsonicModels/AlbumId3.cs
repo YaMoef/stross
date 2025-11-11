@@ -50,13 +50,6 @@ namespace Stross.SubsonicModels
         [System.Xml.Serialization.XmlAttributeAttribute("playCount")]
         public long PlayCount { get; set; }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the PlayCount property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PlayCountSpecified { get; set; }
-        
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("created", DataType="dateTime")]
         public System.DateTime Created { get; set; }
@@ -64,23 +57,9 @@ namespace Stross.SubsonicModels
         [System.Xml.Serialization.XmlAttributeAttribute("starred", DataType="dateTime")]
         public System.DateTime Starred { get; set; }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool StarredSpecified { get; set; }
-        
         [System.Xml.Serialization.XmlAttributeAttribute("year")]
         public int Year { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Year property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool YearSpecified { get; set; }
-        
+
         [System.Xml.Serialization.XmlAttributeAttribute("genre")]
         public string Genre { get; set; }
     }

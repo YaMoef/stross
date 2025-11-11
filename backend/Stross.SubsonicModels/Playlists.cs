@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _playlist = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Playlist collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PlaylistSpecified
-        {
-            get
-            {
-                return ((this.Playlist != null) 
-                            && (this.Playlist.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Playlists" /> class.</para>
         /// </summary>

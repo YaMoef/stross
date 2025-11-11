@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _artist = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Artist collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ArtistSpecified
-        {
-            get
-            {
-                return ((this.Artist != null) 
-                            && (this.Artist.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Starred" /> class.</para>
         /// </summary>
@@ -78,21 +64,7 @@ namespace Stross.SubsonicModels
                 _album = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Album collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AlbumSpecified
-        {
-            get
-            {
-                return ((this.Album != null) 
-                            && (this.Album.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _song;
@@ -107,20 +79,6 @@ namespace Stross.SubsonicModels
             init
             {
                 _song = value;
-            }
-        }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Song collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SongSpecified
-        {
-            get
-            {
-                return ((this.Song != null) 
-                            && (this.Song.Count != 0));
             }
         }
     }

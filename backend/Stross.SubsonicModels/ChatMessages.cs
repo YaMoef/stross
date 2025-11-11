@@ -39,20 +39,6 @@ namespace Stross.SubsonicModels
         }
         
         /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the ChatMessage collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ChatMessageSpecified
-        {
-            get
-            {
-                return ((this.ChatMessage != null) 
-                            && (this.ChatMessage.Count != 0));
-            }
-        }
-        
-        /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="ChatMessages" /> class.</para>
         /// </summary>
         public ChatMessages()

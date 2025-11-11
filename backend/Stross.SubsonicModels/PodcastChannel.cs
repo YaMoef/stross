@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _episode = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Episode collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool EpisodeSpecified
-        {
-            get
-            {
-                return ((this.Episode != null) 
-                            && (this.Episode.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="PodcastChannel" /> class.</para>
         /// </summary>

@@ -39,20 +39,6 @@ namespace Stross.SubsonicModels
         }
         
         /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the SimilarArtist collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SimilarArtistSpecified
-        {
-            get
-            {
-                return ((this.SimilarArtist != null) 
-                            && (this.SimilarArtist.Count != 0));
-            }
-        }
-        
-        /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="ArtistInfo2" /> class.</para>
         /// </summary>
         public ArtistInfo2()

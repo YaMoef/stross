@@ -37,12 +37,5 @@ namespace Stross.SubsonicModels
         
         [System.Xml.Serialization.XmlAttributeAttribute("publishDate", DataType="dateTime")]
         public System.DateTime PublishDate { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the PublishDate property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PublishDateSpecified { get; set; }
     }
 }

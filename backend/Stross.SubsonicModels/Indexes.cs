@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _shortcut = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Shortcut collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ShortcutSpecified
-        {
-            get
-            {
-                return ((this.Shortcut != null) 
-                            && (this.Shortcut.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Indexes" /> class.</para>
         /// </summary>
@@ -78,21 +64,7 @@ namespace Stross.SubsonicModels
                 _index = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Index collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool IndexSpecified
-        {
-            get
-            {
-                return ((this.Index != null) 
-                            && (this.Index.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<Child> _child;
@@ -109,21 +81,7 @@ namespace Stross.SubsonicModels
                 _child = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Child collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ChildSpecified
-        {
-            get
-            {
-                return ((this.Child != null) 
-                            && (this.Child.Count != 0));
-            }
-        }
-        
+
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("lastModified")]
         public long LastModified { get; set; }

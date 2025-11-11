@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _captions = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Captions collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool CaptionsSpecified
-        {
-            get
-            {
-                return ((this.Captions != null) 
-                            && (this.Captions.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="VideoInfo" /> class.</para>
         /// </summary>
@@ -78,21 +64,7 @@ namespace Stross.SubsonicModels
                 _audioTrack = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the AudioTrack collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AudioTrackSpecified
-        {
-            get
-            {
-                return ((this.AudioTrack != null) 
-                            && (this.AudioTrack.Count != 0));
-            }
-        }
-        
+
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         [System.Text.Json.Serialization.JsonIgnore]
         private System.Collections.Generic.List<VideoConversion> _conversion;
@@ -109,21 +81,7 @@ namespace Stross.SubsonicModels
                 _conversion = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Conversion collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ConversionSpecified
-        {
-            get
-            {
-                return ((this.Conversion != null) 
-                            && (this.Conversion.Count != 0));
-            }
-        }
-        
+
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("id")]
         public string Id { get; set; }

@@ -39,20 +39,6 @@ namespace Stross.SubsonicModels
         }
         
         /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Index collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool IndexSpecified
-        {
-            get
-            {
-                return ((this.Index != null) 
-                            && (this.Index.Count != 0));
-            }
-        }
-        
-        /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="ArtistsId3" /> class.</para>
         /// </summary>
         public ArtistsId3()

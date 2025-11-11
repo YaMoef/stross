@@ -38,19 +38,6 @@ namespace Stross.SubsonicModels
             }
         }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Entry collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool EntrySpecified
-        {
-            get
-            {
-                return ((this.Entry != null) 
-                            && (this.Entry.Count != 0));
-            }
-        }
         
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="PlayQueue" /> class.</para>
@@ -63,23 +50,9 @@ namespace Stross.SubsonicModels
         [System.Xml.Serialization.XmlAttributeAttribute("current")]
         public int Current { get; set; }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Current property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool CurrentSpecified { get; set; }
-        
         [System.Xml.Serialization.XmlAttributeAttribute("position")]
         public long Position { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Position property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool PositionSpecified { get; set; }
-        
+
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("username")]
         public string Username { get; set; }

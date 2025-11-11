@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _musicFolder = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the MusicFolder collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool MusicFolderSpecified
-        {
-            get
-            {
-                return ((this.MusicFolder != null) 
-                            && (this.MusicFolder.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="MusicFolders" /> class.</para>
         /// </summary>

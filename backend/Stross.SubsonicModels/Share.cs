@@ -38,19 +38,6 @@ namespace Stross.SubsonicModels
             }
         }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Entry collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool EntrySpecified
-        {
-            get
-            {
-                return ((this.Entry != null) 
-                            && (this.Entry.Count != 0));
-            }
-        }
         
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Share" /> class.</para>
@@ -82,23 +69,9 @@ namespace Stross.SubsonicModels
         [System.Xml.Serialization.XmlAttributeAttribute("expires", DataType="dateTime")]
         public System.DateTime Expires { get; set; }
         
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Expires property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool ExpiresSpecified { get; set; }
-        
         [System.Xml.Serialization.XmlAttributeAttribute("lastVisited", DataType="dateTime")]
         public System.DateTime LastVisited { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the LastVisited property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool LastVisitedSpecified { get; set; }
-        
+
         [System.ComponentModel.DataAnnotations.RequiredAttribute(AllowEmptyStrings=true)]
         [System.Xml.Serialization.XmlAttributeAttribute("visitCount")]
         public int VisitCount { get; set; }

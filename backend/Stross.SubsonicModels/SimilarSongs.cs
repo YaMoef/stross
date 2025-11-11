@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _song = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Song collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool SongSpecified
-        {
-            get
-            {
-                return ((this.Song != null) 
-                            && (this.Song.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="SimilarSongs" /> class.</para>
         /// </summary>

@@ -36,13 +36,6 @@ namespace Stross.SubsonicModels
         public System.DateTime Starred { get; set; }
         
         /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the Starred property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool StarredSpecified { get; set; }
-        
-        /// <summary>
         /// <para xml:lang="en">Minimum inclusive value: 1.</para>
         /// <para xml:lang="en">Maximum inclusive value: 5.</para>
         /// </summary>
@@ -51,25 +44,11 @@ namespace Stross.SubsonicModels
         public int UserRating { get; set; }
         
         /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the UserRating property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool UserRatingSpecified { get; set; }
-        
-        /// <summary>
         /// <para xml:lang="en">Minimum inclusive value: 1.0.</para>
         /// <para xml:lang="en">Maximum inclusive value: 5.0.</para>
         /// </summary>
         [System.ComponentModel.DataAnnotations.RangeAttribute(typeof(double), "1.0", "5.0")]
         [System.Xml.Serialization.XmlAttributeAttribute("averageRating")]
         public double AverageRating { get; set; }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets or sets a value indicating whether the AverageRating property is specified.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool AverageRatingSpecified { get; set; }
     }
 }

@@ -37,21 +37,7 @@ namespace Stross.SubsonicModels
                 _genre = value;
             }
         }
-        
-        /// <summary>
-        /// <para xml:lang="en">Gets a value indicating whether the Genre collection is empty.</para>
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool GenreSpecified
-        {
-            get
-            {
-                return ((this.Genre != null) 
-                            && (this.Genre.Count != 0));
-            }
-        }
-        
+
         /// <summary>
         /// <para xml:lang="en">Initializes a new instance of the <see cref="Genres" /> class.</para>
         /// </summary>
