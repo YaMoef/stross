@@ -43,6 +43,12 @@ public sealed class MusicTrackConfiguration : BaseEntityConfiguration<MusicTrack
             .IsRequired()
             .HasMaxLength(ExternalUrlMaxLength);
 
+        builder.Property(x => x.Size)
+            .IsRequired();
+
+        builder.Property(x => x.Duration)
+            .IsRequired();
+
         // Foreign key relationship with Provider
         builder.HasOne(x => x.Provider)
             .WithMany()
