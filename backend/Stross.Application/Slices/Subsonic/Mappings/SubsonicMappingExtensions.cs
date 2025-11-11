@@ -37,12 +37,12 @@ public static class SubsonicMappingExtensions
             Album = musicTrack.Album?.Name,
             AlbumId = musicTrack.AlbumId.ToString(),
             CoverArt = musicTrack.Id.ToString(),
-            // Duration = null, // TODO: Extract duration from audio file metadata
+            Duration = musicTrack.Duration,
             // BitRate = null, // TODO: Extract bitrate from audio file metadata
             Path = musicTrack.AudioFileLocation,
             Suffix = Path.GetExtension(musicTrack.AudioFileLocation)?.TrimStart('.'),
             ContentType = GetContentTypeFromExtension(Path.GetExtension(musicTrack.AudioFileLocation)),
-            // Size = null, // TODO: Get file size from audio file
+            Size = musicTrack.Size,
             Created = musicTrack.CreatedAt,
             // Year = null, // TODO: Extract year from metadata
             Genre = musicTrack.GenreId.ToString(),
@@ -120,10 +120,10 @@ public static class SubsonicMappingExtensions
             ArtistId = primaryCreator?.Id.ToString(),
             CoverArt = album.Id.ToString(),
             SongCount = album.MusicTracks.Count,
-            // Duration = 0, // TODO: Calculate total duration from tracks
+            Duration = album.MusicTracks.Sum(m => m.Duration),
             Created = album.CreatedAt,
             // Year = null, // TODO: Extract year from album metadata
-            Genre = album.Genre!.Name // TODO: Extract genre from album metadata
+            Genre = album.Genre!.Name
         };
     }
 
@@ -139,7 +139,7 @@ public static class SubsonicMappingExtensions
             ArtistId = primaryCreator?.Id.ToString(),
             CoverArt = album.Id.ToString(),
             SongCount = album.MusicTracks.Count,
-            Duration = 0, // TODO: Calculate total duration from tracks
+            Duration = album.MusicTracks.Sum(m => m.Duration),
             Created = album.CreatedAt,
             Song = album.MusicTracks.Select(t => t.ToSubsonicSongResponse()).ToList(),
             // Year = null, // TODO: Extract year from album metadata
@@ -163,7 +163,9 @@ public static class SubsonicMappingExtensions
             Created = album.CreatedAt,
             // Year = null, // TODO: Extract year from album metadata
             Genre = album.Genre?.Name,
-            Type = MediaType.Music
+            Type = MediaType.Music,
+            Duration = album.MusicTracks.Sum(m => m.Duration),
+            Size = album.MusicTracks.Sum(m => m.Size)
         };
     }
 

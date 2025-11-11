@@ -50,6 +50,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
             {
                 List<Creator> creatorsInProvider = await _context.Creators
                     .Include(c => c.ExternalCreators)
+                    .Include(c => c.MusicTracks)
                     .Where(c => c.ExternalCreators.Any(ecmt => ecmt.ProviderId == parsedId))
                     .OrderBy(c => c.Name)
                     .ToListAsync(cancellationToken);
@@ -67,7 +68,8 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                             Title = c.Name,
                             IsDir = true,
                             Artist = c.Name,
-                            CoverArt = c.Id.ToString()
+                            CoverArt = c.Id.ToString(),
+                            Duration = c.MusicTracks.Sum(m => m.Duration),
                         }).ToList()
                     }
                 };

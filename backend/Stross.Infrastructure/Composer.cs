@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Stross.Config;
+using Stross.Infrastructure.Services.AudioFileMetadataService;
 using Stross.Infrastructure.Services.GrpcService;
 using Stross.Infrastructure.Services.ThumbnailService;
 
@@ -23,6 +24,7 @@ public static class Composer
     {
         services.AddSingleton<IGrpcService, GrpcService>();
         services.AddSingleton<IThumbnailService, ThumbnailService>();
+        services.AddSingleton<IAudioFileMetadataService, AudioFileMetadataService>();
 
         return services;
     }

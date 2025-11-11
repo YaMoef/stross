@@ -9,6 +9,7 @@ using Stross.Domain.Entities;
 using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.Infrastructure.Constants;
+using Stross.Infrastructure.Services.AudioFileMetadataService;
 using Stross.Infrastructure.Services.GrpcService;
 using Stross.Infrastructure.Services.GrpcService.Models;
 using Stross.Infrastructure.Services.ThumbnailService;
@@ -35,12 +36,14 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
     private readonly IGrpcService _grpcService;
     private readonly StrossStorageConfig _storageConfig;
     private readonly IThumbnailService _thumbnailService;
+    private readonly IAudioFileMetadataService _audioFileMetadataService;
 
-    public DownloadMusicTrackCommandHandler(StrossContext context, IGrpcService grpcService, IOptionsSnapshot<StrossStorageConfig> storageConfigSnapshot, IThumbnailService thumbnailService)
+    public DownloadMusicTrackCommandHandler(StrossContext context, IGrpcService grpcService, IOptionsSnapshot<StrossStorageConfig> storageConfigSnapshot, IThumbnailService thumbnailService, IAudioFileMetadataService audioFileMetadataService)
     {
         _context = context;
         _grpcService = grpcService;
         _thumbnailService = thumbnailService;
+        _audioFileMetadataService = audioFileMetadataService;
         _storageConfig = storageConfigSnapshot.Value;
     }
 
@@ -129,6 +132,10 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
             _context.Albums.Add(albumToUse);
         }
 
+        string fullMusicTrackPath = Path.Combine(_storageConfig.BasePath, downloadedMusicTrack.MusicTrackPath);
+        int trackDuration = _audioFileMetadataService.GetDuration(fullMusicTrackPath);
+        long fileSize = _audioFileMetadataService.GetFileSize(fullMusicTrackPath);
+
         Domain.Entities.MusicTrack musicTrack = new Domain.Entities.MusicTrack(providerToUse,
             albumToUse,
             unknownGenre,
@@ -136,7 +143,9 @@ internal sealed class DownloadMusicTrackCommandHandler : IRequestHandler<Downloa
             downloadedMusicTrack.Title,
             downloadedMusicTrack.ThumbnailPath,
             creatorsForMusicTrack,
-            downloadedMusicTrack.SourceUrl);
+            downloadedMusicTrack.SourceUrl,
+            trackDuration,
+            fileSize);
 
         _context.MusicTracks.Add(musicTrack);
 

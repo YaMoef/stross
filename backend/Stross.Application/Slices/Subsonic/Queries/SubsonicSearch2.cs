@@ -37,39 +37,52 @@ internal sealed class SubsonicSearch2QueryHandler : IRequestHandler<SubsonicSear
     {
         string searchQuery = request.Input.Query.SanitizeSearchString()!;
 
-        // Search for artists (creators)
-        List<Creator> artists = await _context.Creators
-            .Where(x => x.Name.ToLower().Contains(searchQuery))
+        // Search for artists (creators) organized by ID3 tags
+        IQueryable<Creator> artistsQuery = _context.Creators
+            .Include(c => c.Albums)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchQuery))
+            artistsQuery = artistsQuery.Where(x => x.Name.ToLower().Contains(searchQuery));
+
+        List<Creator> artists = await artistsQuery
             .Skip(request.Input.ArtistOffset)
             .Take(request.Input.ArtistCount)
             .ToListAsync(cancellationToken);
 
-        // Search for songs (music tracks)
-        List<Domain.Entities.MusicTrack> songs = await _context.MusicTracks
+        // Search for songs (music tracks) organized by ID2 tags
+        IQueryable<Domain.Entities.MusicTrack> songsQuery = _context.MusicTracks
             .Include(x => x.Creators)
+            .Include(x => x.Album)
             .Include(x => x.Provider)
-            .Where(x => x.FriendlyName.ToLower().Contains(searchQuery) ||
-                        x.OriginalName.ToLower().Contains(searchQuery) ||
-                        x.Creators.Any(c => c.Name.ToLower().Contains(searchQuery)))
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchQuery))
+            songsQuery = songsQuery.Where(x => x.FriendlyName.ToLower().Contains(searchQuery) ||
+                                               x.OriginalName.ToLower().Contains(searchQuery) ||
+                                               x.Creators.Any(c => c.Name.ToLower().Contains(searchQuery)));
+
+        List<Domain.Entities.MusicTrack> songs = await songsQuery
             .Skip(request.Input.SongOffset)
             .Take(request.Input.SongCount)
             .ToListAsync(cancellationToken);
 
-        // TODO: Search for albums when SubsonicAlbum entity is created
-        // List<SubsonicAlbum> albums = await _context.SubsonicAlbums
-        //     .Where(x => x.Title.ToLower().Contains(searchQuery) || 
-        //                x.Artist.ToLower().Contains(searchQuery))
-        //     .Skip(request.Input.AlbumOffset)
-        //     .Take(request.Input.AlbumCount)
-        //     .ToListAsync(cancellationToken);
+        IQueryable<Album> albumsQuery = _context.Albums.Include(a => a.Genre).AsQueryable();
 
+        if (!string.IsNullOrEmpty(searchQuery))
+            albumsQuery = albumsQuery.Where(x => x.Name.ToLower().Contains(searchQuery));
+
+        List<Album> albums = await albumsQuery
+            .Skip(request.Input.AlbumOffset)
+            .Take(request.Input.AlbumCount)
+            .ToListAsync(cancellationToken);
 
         Response response = new Response
         {
             SearchResult2 = new SearchResult2
             {
                 Artist = artists.Select(x => x.ToSubsonicArtistResponse()).ToList(),
-                Album = [], // TODO: Implement album search when SubsonicAlbum entity is available
+                Album = albums.Select(x => x.ToSubsonicAlbumListResponse()).ToList(),
                 Song = songs.Select(x => x.ToSubsonicSongResponse()).ToList()
             }
         };

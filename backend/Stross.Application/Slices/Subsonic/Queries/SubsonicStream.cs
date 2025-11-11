@@ -53,14 +53,13 @@ internal sealed class SubsonicStreamQueryHandler : IRequestHandler<SubsonicStrea
             throw new Exception.Exceptions.EntityNotFoundException($"Audio file not found at '{fullAudioPath}'");
 
         // Get file information
-        FileInfo fileInfo = new FileInfo(fullAudioPath);
         string contentType = GetContentTypeFromExtension(Path.GetExtension(fullAudioPath));
         string fileName = Path.GetFileName(fullAudioPath);
 
         return new SubsonicStreamResponse(
             fullAudioPath,
             contentType,
-            fileInfo.Length,
+            musicTrack.Size,
             fileName
         );
     }

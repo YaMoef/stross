@@ -53,7 +53,6 @@ internal sealed class SubsonicDownloadQueryHandler : IRequestHandler<SubsonicDow
             throw new Exception.Exceptions.EntityNotFoundException($"Audio file not found at '{fullAudioPath}'");
 
         // Get file information
-        FileInfo fileInfo = new FileInfo(fullAudioPath);
         string contentType = GetContentTypeFromExtension(Path.GetExtension(fullAudioPath));
 
         // For downloads, use a friendly filename based on the track name
@@ -63,7 +62,7 @@ internal sealed class SubsonicDownloadQueryHandler : IRequestHandler<SubsonicDow
         return new SubsonicDownloadResponse(
             fullAudioPath,
             contentType,
-            fileInfo.Length,
+            musicTrack.Size,
             sanitizedFileName
         );
     }
