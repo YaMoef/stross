@@ -35,3 +35,38 @@ jobs:
           file: ./backend/Stross.Downloader.YT/Dockerfile
           push: true
           tags: "${{ vars.DOCKER_DOWNLOADER_YT_REPOSITORY }}:dev"
+
+      - name: Get ssh host key for gitea
+        if: github.ref == 'refs/heads/dev'
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts && touch ~/.ssh/id_ed25519
+          ssh-keyscan -p 6022 ${{ vars.GIT_INSTANCE_URL }} > ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_KEY_GITEA }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Update deployment repository
+        if: github.ref == 'refs/heads/dev'
+        shell: bash
+        run: |
+          git clone "${{ vars.DEPLOYMENT_REPO_URL }}" deployment-repo
+          cd deployment-repo
+
+          # Configure git
+          git config user.name "gitea"
+          git config user.email "${{ vars.GIT_EMAIL }}"
+
+          # Search and replace the image tag with the new tag
+          find . -name "*stross_dev-compose.yaml" -exec sed -i 's|${{ vars.COMPOSE_DOWNLOADER_YT_REPLACE_REGEX }}${{ steps.extract_tag.outputs.tag }}|g' {} +
+          find . -name "*stross_dev-compose.yaml" -exec sed -i 's|${{ vars.COMPOSE_API_REPLACE_REGEX }}${{ steps.extract_tag.outputs.tag }}|g' {} +
+
+          # Commit and push changes
+          git add .
+          git commit -m "feat(stross): Update image tag to ${{ steps.extract_tag.outputs.tag }}" || echo "No changes to commit"
+          git push
+
+      - name: Send webhook notification
+        if: github.ref == 'refs/heads/dev'
+        shell: bash
+        run: |
+          curl -k -X POST "${{ secrets.WEBHOOK_URL }}"
