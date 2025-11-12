@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -49,16 +50,8 @@ public class YtDlp
         YoutubeVideoMetadata videoMetadata = await GetVideoMetaDataAsync(sanitizedUrl, cancellationToken);
         string channelId = await GetChannelIdAsync(videoMetadata.AuthorUrl, cancellationToken);
 
-        try
-        {
-            await DownloadThumbnailAsync(sanitizedUrl, fullOutputPathThumbnail, cancellationToken);
-        }
-        catch (YtDlpException ex)
-        {
-            _logger.LogWarning(ex, "Failed to download thumbnail for URL: {SanitizedUrl}", sanitizedUrl);
-
-            relativePathThumbnail = "";
-        }
+        string videoId = GetVideoIdFromYoutubeUrl(sanitizedUrl);
+        await DownloadThumbnailAsync(videoId, fullOutputPathThumbnail, cancellationToken);
 
         _logger.LogDebug("Done loading metadata");
 
@@ -150,15 +143,67 @@ public class YtDlp
 
         try
         {
-            using HttpClient httpClient = _httpClientFactory.CreateClient();
-            using HttpResponseMessage response = await httpClient.GetAsync(thumbnailUrl, cancellationToken);
+            bool isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
 
-            response.EnsureSuccessStatusCode();
+            if (isDownloaded)
+            {
+                _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
 
-            using FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
-            await response.Content.CopyToAsync(fileStream, cancellationToken);
+                return;
+            }
 
-            _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
+            _logger.LogWarning("Failed to download maxresdefault thumbnail for videoId: {VideoId}", videoId);
+
+            thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/sddefault.jpg";
+            isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
+
+            if (isDownloaded)
+            {
+                _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
+
+                return;
+            }
+
+            _logger.LogWarning("Failed to download sddefault thumbnail for videoId: {VideoId}", videoId);
+
+            thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg";
+            isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
+
+            if (isDownloaded)
+            {
+                _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
+
+                return;
+            }
+
+            _logger.LogWarning("Failed to download hqdefault thumbnail for videoId: {VideoId}", videoId);
+
+
+            thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/mqdefault.jpg";
+            isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
+
+            if (isDownloaded)
+            {
+                _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
+
+                return;
+            }
+
+            _logger.LogWarning("Failed to download mqdefault thumbnail for videoId: {VideoId}", videoId);
+
+            thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/default.jpg";
+            isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
+
+            if (isDownloaded)
+            {
+                _logger.LogInformation("Thumbnail downloaded successfully for video ID: {VideoId}", videoId);
+
+                return;
+            }
+
+            _logger.LogWarning("Failed to download default thumbnail for videoId: {VideoId}", videoId);
+
+            throw new YtDlpException("Failed to download any thumbnail for video ID: {VideoId}");
         }
         catch (Exception ex)
         {
@@ -166,6 +211,22 @@ public class YtDlp
 
             throw new YtDlpException($"Failed to download thumbnail: {ex.Message}");
         }
+    }
+
+    private async Task<bool> DownloadThumbnailFromUrlAsync(string thumbnailUrl, string outputPath, CancellationToken cancellationToken = default)
+    {
+        using HttpClient httpClient = _httpClientFactory.CreateClient();
+        using HttpResponseMessage response = await httpClient.GetAsync(thumbnailUrl, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return false;
+
+        response.EnsureSuccessStatusCode();
+
+        using FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+        await response.Content.CopyToAsync(fileStream, cancellationToken);
+
+        return true;
     }
 
     private async Task<YoutubeVideoMetadata> GetVideoMetaDataAsync(string videoUrl,
@@ -220,7 +281,7 @@ public class YtDlp
         }
     }
 
-    internal static string SanitizeYoutubeUrl(string url)
+    private static string GetVideoIdFromYoutubeUrl(string url)
     {
         if (string.IsNullOrWhiteSpace(url))
             throw new YtDlpException("URL cannot be null or empty");
@@ -267,6 +328,11 @@ public class YtDlp
         if (string.IsNullOrWhiteSpace(videoId) || videoId.Length != 11 || !Regex.IsMatch(videoId, @"^[a-zA-Z0-9_-]+$"))
             throw new YtDlpException("Invalid YouTube video ID format");
 
-        return $"https://www.youtube.com/watch?v={videoId}";
+        return videoId;
+    }
+
+    internal static string SanitizeYoutubeUrl(string url)
+    {
+        return $"https://www.youtube.com/watch?v={GetVideoIdFromYoutubeUrl(url)}";
     }
 }
