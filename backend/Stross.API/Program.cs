@@ -1,7 +1,9 @@
 using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
+using Stross.API.AuthenticationHandlers;
 using Stross.API.Endpoints;
 using Stross.API.Middleware;
 using Stross.Application;
@@ -55,7 +57,6 @@ builder.Services.AddProblemDetails(opts =>
 string? reverseProxyHost = builder.Configuration.GetValue<string?>("ReverseProxyHost");
 
 if (!string.IsNullOrEmpty(reverseProxyHost))
-{
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders =
@@ -65,7 +66,7 @@ if (!string.IsNullOrEmpty(reverseProxyHost))
 
         if (isIpParseable)
         {
-            if(ip is not null)
+            if (ip is not null)
                 options.KnownProxies.Add(ip);
         }
         else
@@ -74,7 +75,16 @@ if (!string.IsNullOrEmpty(reverseProxyHost))
             options.KnownProxies.Add(addresses[0]);
         }
     });
-}
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = SubsonicAuthenticationOptions.DefaultScheme;
+        options.DefaultChallengeScheme = SubsonicAuthenticationOptions.DefaultScheme;
+    })
+    .AddScheme<SubsonicAuthenticationOptions, SubsonicAuthenticationHandler>(
+        SubsonicAuthenticationOptions.DefaultScheme,
+        _ => { });
 
 builder.AddMusicTrackSlice();
 builder.AddProviderSlice();
@@ -83,7 +93,7 @@ builder.AddThumbnailSlice();
 
 WebApplication app = builder.Build();
 
-if(!string.IsNullOrEmpty(reverseProxyHost))
+if (!string.IsNullOrEmpty(reverseProxyHost))
     app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment()) // development
@@ -147,8 +157,8 @@ app.UseSubsonicFormatCaptureMiddleware();
 app.UseRouting();
 
 app.UseCors();
-app.UseAuthentication();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app

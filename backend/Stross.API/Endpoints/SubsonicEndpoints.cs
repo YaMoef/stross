@@ -1,121 +1,17 @@
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 using MediatR;
-using Stross.Application.Shared.Helpers;
+using Stross.API.Helpers;
 using Stross.Application.Slices.Subsonic.Commands;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Queries;
 using Stross.Application.Slices.Subsonic.ResponseModels;
-using Stross.SubsonicModels.JsonConverters;
 
 namespace Stross.API.Endpoints;
 
 internal static class SubsonicEndpoints
 {
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters =
-        {
-            new JsonStringEnumConverter()
-        },
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        
-        // https://github.com/dotnet/runtime/issues/108237
-        TypeInfoResolverChain = { new DefaultJsonTypeInfoResolver().WithAddedModifier(ContractModifier_Collection) }
-    };
-
-    private static void ContractModifier_Collection(JsonTypeInfo jsonTypeInfo)
-    {
-        if (jsonTypeInfo.Kind != JsonTypeInfoKind.Object)
-        {
-            return;
-        }
-
-        foreach (var property in jsonTypeInfo.Properties)
-        {
-            if (property.PropertyType.IsValueType)
-            {
-                continue;
-            }
-
-            bool isCollection =
-                (property.PropertyType.IsGenericType
-                 && property.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
-                || Array.Exists(
-                    property.PropertyType.GetInterfaces(),
-                    i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICollection<>));
-
-            if (!isCollection)
-            {
-                continue;
-            }
-
-            // Check for WrappedArrayJsonConverter attribute
-            var wrappedArrayAttr = property.AttributeProvider?.GetCustomAttributes(typeof(WrappedArrayJsonConverterAttribute), false)
-                .OfType<WrappedArrayJsonConverterAttribute>()
-                .FirstOrDefault();
-
-            if (wrappedArrayAttr != null)
-            {
-                // Apply the wrapped array converter
-                Type elementType = property.PropertyType.GetGenericArguments()[0];
-                Type converterType = typeof(WrappedArrayJsonConverterFactory).GetNestedType("WrappedArrayJsonConverterImpl`1", BindingFlags.Public)!
-                    .MakeGenericType(elementType);
-                property.CustomConverter = (JsonConverter?)Activator.CreateInstance(converterType, wrappedArrayAttr.ItemName);
-
-                // Also set ShouldSerialize to only serialize when array has elements
-                Type wrappedCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
-                ParameterExpression wrappedParam = Expression.Parameter(wrappedCollectionType, "value");
-                MemberExpression wrappedCountProperty = Expression.Property(wrappedParam, "Count");
-                var wrappedLambda = Expression.Lambda(
-                    typeof(Func<,>).MakeGenericType(wrappedCollectionType, typeof(int)),
-                    wrappedCountProperty,
-                    wrappedParam);
-                Delegate wrappedGetCount = wrappedLambda.Compile();
-                property.ShouldSerialize = (_, value) =>
-                {
-                    return wrappedGetCount.DynamicInvoke(value) is int count && count > 0;
-                };
-                continue;
-            }
-
-            Type genericType = property.PropertyType.GetGenericArguments().FirstOrDefault() ?? property.PropertyType.GetElementType()!;
-            Type collectionType = typeof(ICollection<>).MakeGenericType(genericType);
-
-            ParameterExpression param = Expression.Parameter(collectionType, "value");
-            MemberExpression countProperty = Expression.Property(param, "Count");
-            var lambda = Expression.Lambda(
-                typeof(Func<,>).MakeGenericType(collectionType, typeof(int)),
-                countProperty,
-                param);
-            Delegate getCount = lambda.Compile();
-            property.ShouldSerialize = (_, value) =>
-            {
-                return getCount.DynamicInvoke(value) is int count && count > 0;
-            };
-        }
-    }
-
-    private static IResult CreateSubsonicResult(SubsonicBaseResponse response)
-    {
-        if (response.Format == SubsonicResponseFormat.Xml)
-        {
-            string xmlContent = XmlSerializationHelper.SerializeSubsonicResponse(response);
-
-            return Results.Content(xmlContent, "application/xml", Encoding.UTF8);
-        }
-
-        return Results.Json(response, JsonOptions);
-    }
-
     internal static IEndpointRouteBuilder MapSubsonicEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        RouteGroupBuilder subsonicGroup = endpoints.MapGroup("/rest/");
+        RouteGroupBuilder subsonicGroup = endpoints.MapGroup("/rest/").RequireAuthorization();
 
         // Ping endpoint - test connectivity (GET /subsonic/rest/ping)
         subsonicGroup.MapGet("ping",
@@ -124,7 +20,7 @@ internal static class SubsonicEndpoints
                     SubsonicPingCommand command = new SubsonicPingCommand();
                     SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicPing")
             .WithSummary("Test connectivity with the Subsonic server")
@@ -137,7 +33,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearchQuery query = new SubsonicSearchQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch")
             .WithSummary("Search for files (deprecated, use search2 instead)")
@@ -150,7 +46,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearch2Query query = new SubsonicSearch2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch2")
             .WithSummary("Search for albums, artists and songs")
@@ -163,7 +59,7 @@ internal static class SubsonicEndpoints
                     SubsonicSearch3Query query = new SubsonicSearch3Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch3")
             .WithSummary("Search for albums, artists and songs organized by ID3 tags")
@@ -177,7 +73,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetMusicFoldersQuery query = new SubsonicGetMusicFoldersQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicFolders")
             .WithSummary("Returns available music folders")
@@ -190,7 +86,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetIndexesQuery query = new SubsonicGetIndexesQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetIndexes")
             .WithSummary("Returns an indexed structure of all artists")
@@ -203,7 +99,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetMusicDirectoryQuery query = new SubsonicGetMusicDirectoryQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicDirectory")
             .WithSummary("Returns a listing of all files in a music directory")
@@ -217,7 +113,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetGenresQuery query = new SubsonicGetGenresQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetGenres")
             .WithSummary("Returns all genres")
@@ -230,7 +126,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetArtistsQuery query = new SubsonicGetArtistsQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtists")
             .WithSummary("Returns an indexed structure of all artists organized by ID3 tags")
@@ -243,7 +139,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetArtistQuery query = new SubsonicGetArtistQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtist")
             .WithSummary("Returns details for an artist, including a list of albums")
@@ -256,7 +152,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetAlbumQuery query = new SubsonicGetAlbumQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbum")
             .WithSummary("Returns details for an album, including a list of songs")
@@ -269,7 +165,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetArtistInfoQuery query = new SubsonicGetArtistInfoQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtistInfo")
             .WithSummary("Returns artist info with biography, image URLs and similar artists")
@@ -282,7 +178,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetArtistInfo2Query query = new SubsonicGetArtistInfo2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtistInfo2")
             .WithSummary("Returns artist info with biography, image URLs and similar artists organized by ID3 tags")
@@ -295,7 +191,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetPlaylistsQuery query = new SubsonicGetPlaylistsQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetPlaylists")
             .WithSummary("Returns all playlists")
@@ -308,7 +204,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetAlbumListQuery query = new SubsonicGetAlbumListQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbumList")
             .WithSummary("Returns a list of albums based on various criteria")
@@ -321,7 +217,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetAlbumList2Query query = new SubsonicGetAlbumList2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbumList2")
             .WithSummary("Returns a list of albums based on various criteria, organized according to ID3 tags")
@@ -335,7 +231,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetBookmarksQuery query = new SubsonicGetBookmarksQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetBookmarks")
             .WithSummary("Returns all bookmarks")
@@ -348,7 +244,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetStarredQuery query = new SubsonicGetStarredQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred")
             .WithSummary("Returns starred songs, albums and artists")
@@ -361,7 +257,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetStarred2Query query = new SubsonicGetStarred2Query(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred2")
             .WithSummary("Returns starred songs, albums and artists organized by ID3 tags")
@@ -374,7 +270,7 @@ internal static class SubsonicEndpoints
                     SubsonicGetSongQuery query = new SubsonicGetSongQuery(input);
                     SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetSong")
             .WithSummary("Returns details for a specific song")
@@ -387,7 +283,7 @@ internal static class SubsonicEndpoints
                     SubsonicScrobbleCommand command = new SubsonicScrobbleCommand(input);
                     SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
 
-                    return CreateSubsonicResult(result);
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicScrobble")
             .WithSummary("Registers the local playback of a track")
