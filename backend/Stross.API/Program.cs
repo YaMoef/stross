@@ -10,6 +10,7 @@ using Stross.Application.Slices.Provider;
 using Stross.Application.Slices.Subsonic;
 using Stross.Application.Slices.Thumbnail;
 using Stross.Config;
+using Stross.Domain.Entities;
 using Stross.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,7 @@ builder.AddApplication();
 
 builder.Services.AddOptions<DatabaseConfig>().BindConfiguration(DatabaseConfig.SectionName);
 builder.Services.AddOptions<StrossStorageConfig>().BindConfiguration(StrossStorageConfig.SectionName);
+builder.Services.AddOptions<StrossAdminAccount>().BindConfiguration(StrossAdminAccount.SectionName);
 
 // Add OpenAPI services
 builder.Services.AddOpenApi();
@@ -108,6 +110,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 {
     StrossContext dbContext = scope.ServiceProvider.GetRequiredService<StrossContext>();
     ILogger logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    StrossAdminAccount adminAccount = scope.ServiceProvider.GetRequiredService<IOptions<StrossAdminAccount>>().Value;
 
     // Check and apply pending migrations
     IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
@@ -121,6 +124,20 @@ using (IServiceScope scope = app.Services.CreateScope())
     else
     {
         logger.LogInformation("No pending migrations found.");
+    }
+
+    if (!await dbContext.Users.AnyAsync(u => u.IsDefaultUser))
+    {
+        logger.LogInformation("Creating default admin user...");
+
+        dbContext.Users.Add(new User(adminAccount.UserName, adminAccount.DisplayName)
+        {
+            IsDefaultUser = true
+        });
+
+        await dbContext.SaveChangesAsync();
+
+        logger.LogInformation("Default admin user with userName {UserName} created successfully.", adminAccount.UserName);
     }
 }
 
