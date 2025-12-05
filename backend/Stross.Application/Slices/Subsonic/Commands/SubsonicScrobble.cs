@@ -44,7 +44,7 @@ internal sealed class SubsonicScrobbleCommandHandler : IRequestHandler<SubsonicS
 
         if (!songExists)
         {
-            throw new Stross.Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
+            throw new Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
         }
 
         // TODO: Implement actual scrobbling logic here

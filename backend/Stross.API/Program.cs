@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
+using Stross.Abstractions.Accessors;
+using Stross.API.Accessors;
 using Stross.API.AuthenticationHandlers;
 using Stross.API.Endpoints;
 using Stross.API.Middleware;
@@ -86,6 +88,9 @@ builder.Services
         SubsonicAuthenticationOptions.DefaultScheme,
         _ => { });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
 builder.AddMusicTrackSlice();
 builder.AddProviderSlice();
 builder.AddSubsonicSlice();
@@ -153,6 +158,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 
 app.UseSubsonicSuffixMiddleware();
 app.UseSubsonicFormatCaptureMiddleware();
+app.UseSubsonicErrorHandlerMiddleware();
 
 app.UseRouting();
 

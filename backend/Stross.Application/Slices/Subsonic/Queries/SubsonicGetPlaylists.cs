@@ -3,6 +3,10 @@ using MediatR;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Mappings;
+using Stross.Exception.Exceptions;
 using Stross.SubsonicModels;
 
 namespace Stross.Application.Slices.Subsonic.Queries;
@@ -22,20 +26,38 @@ internal sealed class SubsonicGetPlaylistsQueryValidator : AbstractValidator<Sub
 internal sealed class SubsonicGetPlaylistsQueryHandler : IRequestHandler<SubsonicGetPlaylistsQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetPlaylistsQueryHandler(StrossContext context)
+    public SubsonicGetPlaylistsQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
-    public Task<SubsonicBaseResponse> Handle(SubsonicGetPlaylistsQuery request, CancellationToken cancellationToken)
+    public async Task<SubsonicBaseResponse> Handle(SubsonicGetPlaylistsQuery request, CancellationToken cancellationToken)
     {
-        // TODO: Implement playlist functionality - for now return empty list
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+        
+        List<Domain.Entities.Playlist> publicPlaylists = await _context.Playlists
+            .Include(p => p.Owner)
+            .Include(p => p.PlaylistMusicTracks)
+                .ThenInclude(t => t.MusicTrack)
+            .Where(p => p.Public || p.OwnerId == currentUser.Id)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+
+        List<Playlist> subsonicPlaylists = publicPlaylists
+            .Select(p => p.ToSubsonicPlaylistResponse())
+            .ToList();
+
         Response response = new Response
         {
-            Playlists = new List<Playlist>()
+            Playlists = subsonicPlaylists
         };
 
-        return Task.FromResult(new SubsonicBaseResponse(response));
+        return new SubsonicBaseResponse(response);
     }
 }

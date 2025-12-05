@@ -51,7 +51,7 @@ internal sealed class SubsonicGetCoverArtQueryHandler : IRequestHandler<Subsonic
 
         if (string.IsNullOrEmpty(thumbnailLocation))
         {
-            throw new Stross.Exception.Exceptions.EntityNotFoundException("Cover art not found for the specified ID");
+            throw new Exception.Exceptions.EntityNotFoundException("Cover art not found for the specified ID");
         }
 
         string fullThumbnailLocation = Path.Combine(_storageConfig.BasePath, thumbnailLocation);

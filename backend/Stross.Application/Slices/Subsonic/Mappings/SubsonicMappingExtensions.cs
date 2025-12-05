@@ -5,6 +5,50 @@ namespace Stross.Application.Slices.Subsonic.Mappings;
 
 public static class SubsonicMappingExtensions
 {
+        public static SubsonicModels.Playlist ToSubsonicPlaylistResponse(this Domain.Entities.Playlist playlist)
+        {
+            SubsonicModels.Playlist response = new SubsonicModels.Playlist
+            {
+                Id = playlist.Id.ToString(),
+                Name = playlist.Name,
+                Comment = playlist.Comment,
+                Owner = playlist.Owner.UserName,
+                Public = playlist.Public,
+                SongCount = playlist.SongCount,
+                Duration = playlist.Duration,
+                Created = playlist.CreatedAt,
+                Changed = playlist.UpdatedAt ?? playlist.CreatedAt,
+                CoverArt = playlist.CoverArtLocation
+            };
+
+            return response;
+        }
+
+        public static PlaylistWithSongs ToSubsonicPlaylistWithSongsResponse(this Domain.Entities.Playlist playlist)
+        {
+            SubsonicModels.Playlist playlistResponse = playlist.ToSubsonicPlaylistResponse();
+
+            PlaylistWithSongs response = new PlaylistWithSongs
+            {
+                Id = playlistResponse.Id,
+                Name = playlistResponse.Name,
+                Comment = playlistResponse.Comment,
+                Owner = playlistResponse.Owner,
+                Public = playlistResponse.Public,
+                SongCount = playlistResponse.SongCount,
+                Duration = playlistResponse.Duration,
+                Created = playlistResponse.Created,
+                Changed = playlistResponse.Changed,
+                CoverArt = playlistResponse.CoverArt,
+                Entry = playlist.PlaylistMusicTracks
+                    .OrderBy(t => t.Order)
+                    .Select(t => t.MusicTrack.ToSubsonicSongResponse())
+                    .ToList()
+            };
+
+            return response;
+        }
+
     public static Artist ToSubsonicArtistResponse(this Creator creator)
     {
         return new Artist

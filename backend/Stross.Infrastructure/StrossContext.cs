@@ -38,4 +38,6 @@ public class StrossContext : DbContext
     public DbSet<Album> Albums { get; init; }
     public DbSet<ExternalAlbum> ExternalAlbums { get; init; }
     public DbSet<User> Users { get; init; }
+    public DbSet<Playlist> Playlists { get; init; }
+    public DbSet<PlaylistMusicTrack> PlaylistMusicTracks { get; init; }
 }

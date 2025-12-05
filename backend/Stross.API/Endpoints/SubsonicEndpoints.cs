@@ -1,4 +1,6 @@
+using System.Text;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Stross.API.Helpers;
 using Stross.Application.Slices.Subsonic.Commands;
 using Stross.Application.Slices.Subsonic.InputModels;
@@ -197,6 +199,19 @@ internal static class SubsonicEndpoints
             .WithSummary("Returns all playlists")
             .WithOpenApi();
 
+        // GetPlaylist endpoint - returns a single playlist with songs (GET /subsonic/rest/getPlaylist)
+        subsonicGroup.MapGet("getPlaylist",
+                async ([AsParameters]SubsonicGetPlaylistInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicGetPlaylistQuery query = new SubsonicGetPlaylistQuery(input);
+                    SubsonicBaseResponse result = await sender.Send(query, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicGetPlaylist")
+            .WithSummary("Returns a single playlist with its songs")
+            .WithOpenApi();
+
         // GetAlbumList endpoint - returns a list of albums based on various criteria (GET /subsonic/rest/getAlbumList)
         subsonicGroup.MapGet("getAlbumList",
                 async ([AsParameters]SubsonicGetAlbumListInput input, IMediator sender, CancellationToken cancellationToken) =>
@@ -287,6 +302,45 @@ internal static class SubsonicEndpoints
                 })
             .WithName("SubsonicScrobble")
             .WithSummary("Registers the local playback of a track")
+            .WithOpenApi();
+
+        // createPlaylist endpoint - creates a new playlist (GET /subsonic/rest/createPlaylist)
+        subsonicGroup.MapGet("createPlaylist",
+                async ([AsParameters] SubsonicCreatePlaylistInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicCreatePlaylistCommand command = new SubsonicCreatePlaylistCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicCreatePlaylist")
+            .WithSummary("Creates a new playlist")
+            .WithOpenApi();
+
+        // updatePlaylist endpoint - updates an existing playlist (GET /subsonic/rest/updatePlaylist)
+        subsonicGroup.MapGet("updatePlaylist",
+                async ([AsParameters]SubsonicUpdatePlaylistInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicUpdatePlaylistCommand command = new SubsonicUpdatePlaylistCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicUpdatePlaylist")
+            .WithSummary("Updates an existing playlist")
+            .WithOpenApi();
+
+        // deletePlaylist endpoint - deletes an existing playlist (GET /subsonic/rest/deletePlaylist)
+        subsonicGroup.MapGet("deletePlaylist",
+                async ([AsParameters]SubsonicDeletePlaylistInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicDeletePlaylistCommand command = new SubsonicDeletePlaylistCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicDeletePlaylist")
+            .WithSummary("Deletes an existing playlist")
             .WithOpenApi();
 
         // Stream endpoint - streams audio content for a song (GET /subsonic/rest/stream)

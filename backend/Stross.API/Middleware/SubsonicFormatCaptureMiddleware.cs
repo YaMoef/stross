@@ -18,17 +18,13 @@ public class SubsonicFormatCaptureMiddleware
 
     public async Task InvokeAsync(HttpContext context, ISubsonicResponseFormatService subsonicContext)
     {
-        // Only apply to Subsonic REST API endpoints
-        if (context.Request.Path.StartsWithSegments("/rest"))
-        {
-            // Check the 'f' parameter
-            string? format = context.Request.Query["f"].FirstOrDefault();
+        // Check the 'f' parameter
+        string? format = context.Request.Query["f"].FirstOrDefault();
 
-            subsonicContext.SetResponseFormat(SubsonicResponseFormat.Xml);
+        subsonicContext.SetResponseFormat(SubsonicResponseFormat.Xml);
 
-            if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase) || string.Equals(format, "jsonp", StringComparison.OrdinalIgnoreCase))
-                subsonicContext.SetResponseFormat(SubsonicResponseFormat.Json);
-        }
+        if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase) || string.Equals(format, "jsonp", StringComparison.OrdinalIgnoreCase))
+            subsonicContext.SetResponseFormat(SubsonicResponseFormat.Json);
 
         await _next(context);
     }

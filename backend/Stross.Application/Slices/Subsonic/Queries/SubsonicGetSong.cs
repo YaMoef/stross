@@ -46,7 +46,7 @@ internal sealed class SubsonicGetSongQueryHandler : IRequestHandler<SubsonicGetS
 
         if (musicTrack == null)
         {
-            throw new Stross.Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
+            throw new Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
         }
 
         // Convert to Subsonic format using existing mapping

@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Stross.Abstractions\Stross.Abstractions.csproj" />
         <ProjectReference Include="..\Stross.Config\Stross.Config.csproj"/>
         <ProjectReference Include="..\Stross.Domain\Stross.Domain.csproj"/>
         <ProjectReference Include="..\Stross.Exception\Stross.Exception.csproj"/>
