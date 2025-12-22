@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -25,10 +27,12 @@ internal sealed class SubsonicGetAlbumList2QueryValidator : AbstractValidator<Su
 internal sealed class SubsonicGetAlbumList2QueryHandler : IRequestHandler<SubsonicGetAlbumList2Query, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetAlbumList2QueryHandler(StrossContext context)
+    public SubsonicGetAlbumList2QueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetAlbumList2Query request, CancellationToken cancellationToken)
@@ -68,9 +72,14 @@ internal sealed class SubsonicGetAlbumList2QueryHandler : IRequestHandler<Subson
             .Take(request.Input.Size)
             .ToListAsync(cancellationToken);
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
         Response response = new Response
         {
-            AlbumList2 = albums.Select(a => a.ToSubsonicAlbumId3Response()).ToList()
+            AlbumList2 = albums.Select(a => a.ToSubsonicAlbumId3Response(starredData.StarredAlbums.GetValueOrDefault(a.Id))).ToList()
         };
 
         return new SubsonicBaseResponse(response);

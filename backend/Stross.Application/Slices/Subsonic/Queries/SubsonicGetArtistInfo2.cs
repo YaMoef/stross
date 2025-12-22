@@ -67,7 +67,7 @@ internal sealed class SubsonicGetArtistInfo2QueryHandler : IRequestHandler<Subso
             SmallImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=small",
             MediumImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=medium", 
             LargeImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=large",
-            SimilarArtist = similarArtists.Select(a => a.ToSubsonicArtistID3Response()).ToList()
+            SimilarArtist = similarArtists.Select(a => a.ToSubsonicArtistID3Response(null)).ToList()
         };
 
         Response response = new Response

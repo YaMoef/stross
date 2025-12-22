@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -25,10 +27,12 @@ internal sealed class SubsonicGetArtistsQueryValidator : AbstractValidator<Subso
 internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicGetArtistsQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetArtistsQueryHandler(StrossContext context)
+    public SubsonicGetArtistsQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetArtistsQuery request, CancellationToken cancellationToken)
@@ -51,13 +55,18 @@ internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicG
         // Group creators by first letter (ignoring articles) - same logic as getIndexes but for ID3
         Dictionary<string, List<Creator>> groupedCreators = GroupCreatorsByFirstLetter(creators);
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
         // Convert to response format using ID3 response models
         List<IndexId3> indexes = groupedCreators
             .OrderBy(kvp => kvp.Key)
             .Select(kvp => new IndexId3
             {
                 Name = kvp.Key,
-                Artist = kvp.Value.Select(c => c.ToSubsonicArtistID3Response()).ToList()
+                Artist = kvp.Value.Select(c => c.ToSubsonicArtistID3Response(starredData.StarredArtists.GetValueOrDefault(c.Id))).ToList()
             })
             .ToList();
 

@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -53,7 +54,9 @@ internal sealed class SubsonicGetPlaylistQueryHandler : IRequestHandler<Subsonic
         if (playlist is null)
             throw new EntityNotFoundException($"Playlist with id {request.Input.Id} was not found");
 
-        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse();
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
+        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse(starredData.StarredTracks);
 
         Response response = new Response
         {

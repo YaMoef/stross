@@ -1,7 +1,9 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
 using Stross.Application.Shared.Helpers;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -27,10 +29,12 @@ internal sealed class SubsonicSearchQueryValidator : AbstractValidator<SubsonicS
 internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearchQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicSearchQueryHandler(StrossContext context)
+    public SubsonicSearchQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicSearchQuery request, CancellationToken cancellationToken)
@@ -72,13 +76,18 @@ internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearc
             .Take(request.Input.Count)
             .ToListAsync(cancellationToken);
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
         Response response = new Response
         {
             SearchResult = new SearchResult
             {
                 Offset = request.Input.Offset,
                 TotalHits = totalHits,
-                Match = results.Select(x => x.ToSubsonicSongResponse()).ToList()
+                Match = results.Select(x => x.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(x.Id))).ToList()
             }
         };
 

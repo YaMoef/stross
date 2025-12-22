@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -25,10 +27,12 @@ internal sealed class SubsonicGetSongQueryValidator : AbstractValidator<Subsonic
 internal sealed class SubsonicGetSongQueryHandler : IRequestHandler<SubsonicGetSongQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetSongQueryHandler(StrossContext context)
+    public SubsonicGetSongQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetSongQuery request, CancellationToken cancellationToken)
@@ -49,8 +53,13 @@ internal sealed class SubsonicGetSongQueryHandler : IRequestHandler<SubsonicGetS
             throw new Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
         }
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
         // Convert to Subsonic format using existing mapping
-        Child song = musicTrack.ToSubsonicSongResponse();
+        Child song = musicTrack.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(musicTrack.Id));
 
         Response response = new Response
         {

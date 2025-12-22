@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -26,10 +28,12 @@ internal sealed class SubsonicGetIndexesQueryValidator : AbstractValidator<Subso
 internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicGetIndexesQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetIndexesQueryHandler(StrossContext context)
+    public SubsonicGetIndexesQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetIndexesQuery request, CancellationToken cancellationToken)
@@ -72,13 +76,18 @@ internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicG
         // Group creators by first letter (ignoring articles)
         Dictionary<string, List<Creator>> groupedCreators = GroupCreatorsByFirstLetter(creators);
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
         // Convert to response format
         List<Index> indexes = groupedCreators
             .OrderBy(kvp => kvp.Key)
             .Select(kvp => new Index
             {
                 Name = kvp.Key,
-                Artist = kvp.Value.Select(c => c.ToSubsonicIndexArtistResponse()).ToList()
+                Artist = kvp.Value.Select(c => c.ToSubsonicIndexArtistResponse(starredData.StarredArtists.GetValueOrDefault(c.Id))).ToList()
             })
             .ToList();
 
@@ -89,7 +98,7 @@ internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicG
                 LastModified = lastModified,
                 IgnoredArticles = "The El La Los Las Le Les",
                 Index = indexes,
-                Child = creators.SelectMany(c => c.MusicTracks.Select(t => t.ToSubsonicSongResponse())).ToList(),
+                Child = creators.SelectMany(c => c.MusicTracks.Select(t => t.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(t.Id)))).ToList(),
                 Shortcut = []
             }
         };

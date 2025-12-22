@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -30,10 +32,12 @@ internal sealed class SubsonicGetAlbumQueryValidator : AbstractValidator<Subsoni
 internal sealed class SubsonicGetAlbumQueryHandler : IRequestHandler<SubsonicGetAlbumQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetAlbumQueryHandler(StrossContext context)
+    public SubsonicGetAlbumQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetAlbumQuery request, CancellationToken cancellationToken)
@@ -61,9 +65,16 @@ internal sealed class SubsonicGetAlbumQueryHandler : IRequestHandler<SubsonicGet
             throw new EntityNotFoundException($"Album with ID {albumId} not found");
         }
 
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        StarredData starredData = currentUser is not null
+            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+            : new StarredData(new(), new(), new());
+
+        DateTime? albumStarredDate = starredData.StarredAlbums.GetValueOrDefault(album.Id);
+
         Response response = new Response
         {
-            Album = album.ToSubsonicAlbumWithSongsResponse()
+            Album = album.ToSubsonicAlbumWithSongsResponse(albumStarredDate, starredData.StarredTracks)
         };
 
         return new SubsonicBaseResponse(response);

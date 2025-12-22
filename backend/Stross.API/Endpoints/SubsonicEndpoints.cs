@@ -304,6 +304,32 @@ internal static class SubsonicEndpoints
             .WithSummary("Registers the local playback of a track")
             .WithOpenApi();
 
+        // Star endpoint - stars songs, albums and artists (GET /subsonic/rest/star)
+        subsonicGroup.MapGet("star",
+                async ([AsParameters]SubsonicStarInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicStarCommand command = new SubsonicStarCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicStar")
+            .WithSummary("Stars songs, albums and artists")
+            .WithOpenApi();
+
+        // Unstar endpoint - unstars songs, albums and artists (GET /subsonic/rest/unstar)
+        subsonicGroup.MapGet("unstar",
+                async ([AsParameters]SubsonicUnstarInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicUnstarCommand command = new SubsonicUnstarCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicUnstar")
+            .WithSummary("Unstars songs, albums and artists")
+            .WithOpenApi();
+
         // createPlaylist endpoint - creates a new playlist (GET /subsonic/rest/createPlaylist)
         subsonicGroup.MapGet("createPlaylist",
                 async ([AsParameters] SubsonicCreatePlaylistInput input, IMediator sender, CancellationToken cancellationToken) =>

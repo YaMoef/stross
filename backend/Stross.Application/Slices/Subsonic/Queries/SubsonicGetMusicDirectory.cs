@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -31,10 +33,12 @@ internal sealed class SubsonicGetMusicDirectoryQueryValidator : AbstractValidato
 internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<SubsonicGetMusicDirectoryQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetMusicDirectoryQueryHandler(StrossContext context)
+    public SubsonicGetMusicDirectoryQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetMusicDirectoryQuery request, CancellationToken cancellationToken)
@@ -96,6 +100,11 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                 ExternalCreator? externalRelation = creator.ExternalCreators.FirstOrDefault();
                 string parentId = externalRelation?.ProviderId.ToString() ?? "1";
 
+                Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+                StarredData starredData = currentUser is not null
+                    ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
+                    : new StarredData(new(), new(), new());
+
                 Response response = new Response
                 {
                     Directory = new Directory
@@ -103,7 +112,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                         Id = creator.Id.ToString(),
                         Name = creator.Name,
                         Parent = parentId,
-                        Child = musicTracksForCreator.Select(t => t.ToSubsonicSongResponse()).ToList()
+                        Child = musicTracksForCreator.Select(t => t.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(t.Id))).ToList()
                     }
                 };
 
