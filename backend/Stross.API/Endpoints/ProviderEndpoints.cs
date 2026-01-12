@@ -1,5 +1,4 @@
 using MediatR;
-using Stross.Application.Slices.MusicTrack.Commands;
 using Stross.Application.Slices.Provider.Commands;
 using Stross.Application.Slices.Provider.InputModels;
 
@@ -19,7 +18,7 @@ internal static class ProviderEndpoints
 
                     return Results.Ok(result);
                 });
-        
+
         return endpoints;
     }
 }

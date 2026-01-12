@@ -46,29 +46,27 @@ internal sealed class SubsonicGetAlbumQueryHandler : IRequestHandler<SubsonicGet
 
         // Try to parse the album ID
         if (!long.TryParse(albumId, out long parsedAlbumId))
-        {
             throw new EntityNotFoundException($"Invalid album ID: {albumId}");
-        }
+
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
 
         // Get the album with its songs and creators
         Album? album = await _context.Albums
             .Include(a => a.MusicTracks)
-                .ThenInclude(mt => mt.Creators)
+            .ThenInclude(mt => mt.Creators)
             .Include(a => a.MusicTracks)
-                .ThenInclude(mt => mt.Provider)
+            .ThenInclude(mt => mt.Provider)
             .Include(a => a.Creators)
             .Include(a => a.Genre)
             .FirstOrDefaultAsync(a => a.Id == parsedAlbumId, cancellationToken);
 
         if (album is null)
-        {
             throw new EntityNotFoundException($"Album with ID {albumId} not found");
-        }
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         DateTime? albumStarredDate = starredData.StarredAlbums.GetValueOrDefault(album.Id);
 

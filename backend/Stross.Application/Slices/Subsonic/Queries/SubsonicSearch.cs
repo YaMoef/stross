@@ -8,6 +8,7 @@ using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -39,6 +40,11 @@ internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearc
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicSearchQuery request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         IQueryable<Domain.Entities.MusicTrack> query = _context.MusicTracks
             .Include(x => x.Creators)
             .Include(x => x.Provider)
@@ -76,10 +82,7 @@ internal sealed class SubsonicSearchQueryHandler : IRequestHandler<SubsonicSearc
             .Take(request.Input.Count)
             .ToListAsync(cancellationToken);
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         Response response = new Response
         {

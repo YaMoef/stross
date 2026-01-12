@@ -37,7 +37,7 @@ internal sealed class SubsonicGetStarredQueryHandler : IRequestHandler<SubsonicG
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetStarredQuery request, CancellationToken cancellationToken)
     {
-        Stross.Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
 
         if (currentUser is null)
             throw new AuthenticationException();
@@ -45,14 +45,14 @@ internal sealed class SubsonicGetStarredQueryHandler : IRequestHandler<SubsonicG
         List<UserStarredItem> starredItems = await _context.UserStarredItems
             .AsSplitQuery()
             .Include(s => s.MusicTrack)!
-                .ThenInclude(t => t.Album)!
-                    .ThenInclude(a => a!.Genre)
+            .ThenInclude(t => t!.Album)!
+            .ThenInclude(a => a!.Genre)
             .Include(s => s.MusicTrack)!
-                .ThenInclude(t => t.Creators)
+            .ThenInclude(t => t!.Creators)
             .Include(s => s.Album)!
-                .ThenInclude(a => a.Genre)
+            .ThenInclude(a => a!.Genre)
             .Include(s => s.Album)!
-                .ThenInclude(a => a.Creators)
+            .ThenInclude(a => a!.Creators)
             .Include(s => s.Artist)
             .Where(s => s.UserId == currentUser.Id)
             .ToListAsync(cancellationToken);

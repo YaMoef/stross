@@ -46,29 +46,27 @@ internal sealed class SubsonicGetArtistQueryHandler : IRequestHandler<SubsonicGe
 
         // Try to parse the artist ID
         if (!long.TryParse(artistId, out long creatorId))
-        {
             throw new EntityNotFoundException($"Invalid artist ID: {artistId}");
-        }
+
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
 
         // Get the creator (artist) with their albums
         Creator? creator = await _context.Creators
             .Include(c => c.Albums)
-                .ThenInclude(a => a.MusicTracks)
+            .ThenInclude(a => a.MusicTracks)
             .Include(c => c.Albums)
-                .ThenInclude(a => a.Creators)
+            .ThenInclude(a => a.Creators)
             .Include(a => a.Albums)
             .ThenInclude(a => a.Genre)
             .FirstOrDefaultAsync(c => c.Id == creatorId, cancellationToken);
 
         if (creator is null)
-        {
             throw new EntityNotFoundException($"Artist with ID {artistId} not found");
-        }
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         DateTime? artistStarredDate = starredData.StarredArtists.GetValueOrDefault(creator.Id);
 

@@ -7,6 +7,7 @@ using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -37,6 +38,11 @@ internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicG
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetArtistsQuery request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         // Build the query for creators (artists)
         IQueryable<Creator> creatorsQuery = _context.Creators
             .Include(c => c.Albums)
@@ -55,10 +61,7 @@ internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicG
         // Group creators by first letter (ignoring articles) - same logic as getIndexes but for ID3
         Dictionary<string, List<Creator>> groupedCreators = GroupCreatorsByFirstLetter(creators);
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         // Convert to response format using ID3 response models
         List<IndexId3> indexes = groupedCreators

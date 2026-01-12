@@ -8,6 +8,7 @@ using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -39,6 +40,11 @@ internal sealed class SubsonicSearch2QueryHandler : IRequestHandler<SubsonicSear
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicSearch2Query request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         string searchQuery = request.Input.Query.SanitizeSearchString()!;
 
         // Search for artists (creators) organized by ID3 tags
@@ -81,10 +87,7 @@ internal sealed class SubsonicSearch2QueryHandler : IRequestHandler<SubsonicSear
             .Take(request.Input.AlbumCount)
             .ToListAsync(cancellationToken);
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         Response response = new Response
         {

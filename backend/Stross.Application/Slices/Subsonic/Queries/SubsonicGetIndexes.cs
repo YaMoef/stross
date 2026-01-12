@@ -7,6 +7,7 @@ using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 using Index = Stross.SubsonicModels.Index;
@@ -38,6 +39,11 @@ internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicG
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetIndexesQuery request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         // Get the last modified timestamp from the most recently updated creator
         long lastModified = await GetLastModifiedTimestamp(request.Input.IfModifiedSince, cancellationToken);
 
@@ -76,10 +82,7 @@ internal sealed class SubsonicGetIndexesQueryHandler : IRequestHandler<SubsonicG
         // Group creators by first letter (ignoring articles)
         Dictionary<string, List<Creator>> groupedCreators = GroupCreatorsByFirstLetter(creators);
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         // Convert to response format
         List<Index> indexes = groupedCreators

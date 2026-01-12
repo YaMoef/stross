@@ -46,6 +46,11 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
         // parse as a long
         if (long.TryParse(request.Input.Id, out long parsedId))
         {
+            Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+            if (currentUser is null)
+                throw new AuthenticationException();
+
             // Check if it's a provider
             Domain.Entities.Provider? provider = await _context.Providers
                 .FirstOrDefaultAsync(p => p.Id == parsedId, cancellationToken);
@@ -73,7 +78,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                             IsDir = true,
                             Artist = c.Name,
                             CoverArt = c.Id.ToString(),
-                            Duration = c.MusicTracks.Sum(m => m.Duration),
+                            Duration = c.MusicTracks.Sum(m => m.Duration)
                         }).ToList()
                     }
                 };
@@ -100,10 +105,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                 ExternalCreator? externalRelation = creator.ExternalCreators.FirstOrDefault();
                 string parentId = externalRelation?.ProviderId.ToString() ?? "1";
 
-                Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-                StarredData starredData = currentUser is not null
-                    ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-                    : new StarredData(new(), new(), new());
+                StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
                 Response response = new Response
                 {

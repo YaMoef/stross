@@ -6,6 +6,7 @@ using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -39,9 +40,12 @@ internal sealed class SubsonicGetSongQueryHandler : IRequestHandler<SubsonicGetS
     {
         // Parse the song ID
         if (!long.TryParse(request.Input.Id, out long songId))
-        {
-            throw new Stross.Exception.Exceptions.ValidationException("Invalid song ID format");
-        }
+            throw new Exception.Exceptions.ValidationException("Invalid song ID format");
+
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
 
         // Retrieve the song with its creators
         Domain.Entities.MusicTrack? musicTrack = await _context.MusicTracks
@@ -49,14 +53,9 @@ internal sealed class SubsonicGetSongQueryHandler : IRequestHandler<SubsonicGetS
             .FirstOrDefaultAsync(x => x.Id == songId, cancellationToken);
 
         if (musicTrack == null)
-        {
-            throw new Exception.Exceptions.EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
-        }
+            throw new EntityNotFoundException($"Song with ID '{request.Input.Id}' not found");
 
-        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
-        StarredData starredData = currentUser is not null
-            ? await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken)
-            : new StarredData(new(), new(), new());
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
 
         // Convert to Subsonic format using existing mapping
         Child song = musicTrack.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(musicTrack.Id));
