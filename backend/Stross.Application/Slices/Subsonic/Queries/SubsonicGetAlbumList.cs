@@ -1,10 +1,13 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -25,14 +28,21 @@ internal sealed class SubsonicGetAlbumListQueryValidator : AbstractValidator<Sub
 internal sealed class SubsonicGetAlbumListQueryHandler : IRequestHandler<SubsonicGetAlbumListQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetAlbumListQueryHandler(StrossContext context)
+    public SubsonicGetAlbumListQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetAlbumListQuery request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         IQueryable<Album> albumsQuery = _context.Albums
             .Include(a => a.Creators)
             .Include(a => a.Genre)
@@ -57,7 +67,7 @@ internal sealed class SubsonicGetAlbumListQueryHandler : IRequestHandler<Subsoni
             "recent" => albumsQuery.OrderByDescending(a => a.UpdatedAt),
             "alphabeticalByName" => albumsQuery.OrderBy(a => a.Name),
             "alphabeticalByArtist" => albumsQuery.OrderBy(a => a.Creators.FirstOrDefault()!.Name).ThenBy(a => a.Name),
-            "starred" => albumsQuery.Where(a => false), // TODO: Implement starring functionality - for now return empty
+            "starred" => albumsQuery.Where(a => _context.UserStarredItems.Any(usi => usi.AlbumId == a.Id && usi.UserId == currentUser.Id)),
             "byYear" => ApplyYearFilter(albumsQuery, request.Input.FromYear, request.Input.ToYear),
             "byGenre" => ApplyGenreFilter(albumsQuery, request.Input.Genre),
             _ => albumsQuery.OrderBy(a => a.Name)
@@ -69,9 +79,11 @@ internal sealed class SubsonicGetAlbumListQueryHandler : IRequestHandler<Subsoni
             .Take(request.Input.Size)
             .ToListAsync(cancellationToken);
 
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
         Response response = new Response
         {
-            AlbumList = albums.Select(a => a.ToSubsonicAlbumListResponse()).ToList()
+            AlbumList = albums.Select(a => a.ToSubsonicAlbumListResponse(starredData.StarredAlbums.GetValueOrDefault(a.Id))).ToList()
         };
 
         return new SubsonicBaseResponse(response);

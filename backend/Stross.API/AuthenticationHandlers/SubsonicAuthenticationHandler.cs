@@ -52,10 +52,10 @@ public class SubsonicAuthenticationHandler : AuthenticationHandler<SubsonicAuthe
             {
                 new Claim(ClaimTypes.Name, user.UserName), new Claim(ClaimTypes.GivenName, user.DisplayName)
             };
-            ClaimsIdentity identity = new ClaimsIdentity(claims, Options.Scheme);
+            ClaimsIdentity identity = new ClaimsIdentity(claims, SubsonicAuthenticationOptions.Scheme);
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
 
-            return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Options.Scheme));
+            return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, SubsonicAuthenticationOptions.Scheme));
         }
         catch (AuthenticationException ex)
         {

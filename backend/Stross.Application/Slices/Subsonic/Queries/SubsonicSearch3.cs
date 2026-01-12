@@ -1,11 +1,14 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
 using Stross.Application.Shared.Helpers;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -27,14 +30,21 @@ internal sealed class SubsonicSearch3QueryValidator : AbstractValidator<Subsonic
 internal sealed class SubsonicSearch3QueryHandler : IRequestHandler<SubsonicSearch3Query, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicSearch3QueryHandler(StrossContext context)
+    public SubsonicSearch3QueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicSearch3Query request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         string searchQuery = request.Input.Query.SanitizeSearchString()!;
 
         // Search for artists (creators) organized by ID3 tags
@@ -77,13 +87,15 @@ internal sealed class SubsonicSearch3QueryHandler : IRequestHandler<SubsonicSear
             .Take(request.Input.AlbumCount)
             .ToListAsync(cancellationToken);
 
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
         Response response = new Response
         {
             SearchResult3 = new SearchResult3
             {
-                Artist = artists.Select(x => x.ToSubsonicArtistID3Response()).ToList(),
-                Album = albums.Select(x => x.ToSubsonicAlbumId3Response()).ToList(),
-                Song = songs.Select(x => x.ToSubsonicSongResponse()).ToList()
+                Artist = artists.Select(x => x.ToSubsonicArtistID3Response(starredData.StarredArtists.GetValueOrDefault(x.Id))).ToList(),
+                Album = albums.Select(x => x.ToSubsonicAlbumId3Response(starredData.StarredAlbums.GetValueOrDefault(x.Id))).ToList(),
+                Song = songs.Select(x => x.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(x.Id))).ToList()
             }
         };
 

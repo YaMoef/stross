@@ -40,4 +40,5 @@ public class StrossContext : DbContext
     public DbSet<User> Users { get; init; }
     public DbSet<Playlist> Playlists { get; init; }
     public DbSet<PlaylistMusicTrack> PlaylistMusicTracks { get; init; }
+    public DbSet<UserStarredItem> UserStarredItems { get; init; }
 }

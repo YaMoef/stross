@@ -80,7 +80,7 @@ internal sealed class SubsonicCreatePlaylistCommandHandler : IRequestHandler<Sub
         _context.Playlists.Add(playlist);
         await _context.SaveChangesAsync(cancellationToken);
 
-        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse();
+        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse(null);
 
         Response response = new Response
         {

@@ -1,6 +1,4 @@
-using System.Text;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Stross.API.Helpers;
 using Stross.Application.Slices.Subsonic.Commands;
 using Stross.Application.Slices.Subsonic.InputModels;
@@ -25,8 +23,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicPing")
-            .WithSummary("Test connectivity with the Subsonic server")
-            .WithOpenApi();
+            .WithSummary("Test connectivity with the Subsonic server");
 
         // Search endpoint (deprecated since 1.4.0, but still supported) (GET /subsonic/rest/search)
         subsonicGroup.MapGet("search",
@@ -38,8 +35,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch")
-            .WithSummary("Search for files (deprecated, use search2 instead)")
-            .WithOpenApi();
+            .WithSummary("Search for files (deprecated, use search2 instead)");
 
         // Search2 endpoint - returns albums, artists and songs (GET /subsonic/rest/search2)
         subsonicGroup.MapGet("search2",
@@ -51,8 +47,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch2")
-            .WithSummary("Search for albums, artists and songs")
-            .WithOpenApi();
+            .WithSummary("Search for albums, artists and songs");
 
         // Search3 endpoint - similar to search2 but organizes music according to ID3 tags (GET /subsonic/rest/search3)
         subsonicGroup.MapGet("search3",
@@ -64,8 +59,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicSearch3")
-            .WithSummary("Search for albums, artists and songs organized by ID3 tags")
-            .WithOpenApi();
+            .WithSummary("Search for albums, artists and songs organized by ID3 tags");
 
         // GetMusicFolders endpoint - returns available music folders (GET /subsonic/rest/getMusicFolders)
         subsonicGroup.MapGet("getMusicFolders",
@@ -78,8 +72,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicFolders")
-            .WithSummary("Returns available music folders")
-            .WithOpenApi();
+            .WithSummary("Returns available music folders");
 
         // GetIndexes endpoint - returns an indexed structure of all artists (GET /subsonic/rest/getIndexes)
         subsonicGroup.MapGet("getIndexes",
@@ -91,8 +84,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetIndexes")
-            .WithSummary("Returns an indexed structure of all artists")
-            .WithOpenApi();
+            .WithSummary("Returns an indexed structure of all artists");
 
         // GetMusicDirectory endpoint - returns a listing of all files in a music directory (GET /subsonic/rest/getMusicDirectory)
         subsonicGroup.MapGet("getMusicDirectory",
@@ -104,8 +96,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetMusicDirectory")
-            .WithSummary("Returns a listing of all files in a music directory")
-            .WithOpenApi();
+            .WithSummary("Returns a listing of all files in a music directory");
 
         // GetGenres endpoint - returns all genres (GET /subsonic/rest/getGenres)
         subsonicGroup.MapGet("getGenres",
@@ -118,8 +109,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetGenres")
-            .WithSummary("Returns all genres")
-            .WithOpenApi();
+            .WithSummary("Returns all genres");
 
         // GetArtists endpoint - returns an indexed structure of all artists organized by ID3 tags (GET /subsonic/rest/getArtists)
         subsonicGroup.MapGet("getArtists",
@@ -131,8 +121,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtists")
-            .WithSummary("Returns an indexed structure of all artists organized by ID3 tags")
-            .WithOpenApi();
+            .WithSummary("Returns an indexed structure of all artists organized by ID3 tags");
 
         // GetArtist endpoint - returns details for an artist, including a list of albums (GET /subsonic/rest/getArtist)
         subsonicGroup.MapGet("getArtist",
@@ -144,8 +133,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtist")
-            .WithSummary("Returns details for an artist, including a list of albums")
-            .WithOpenApi();
+            .WithSummary("Returns details for an artist, including a list of albums");
 
         // GetAlbum endpoint - returns details for an album, including a list of songs (GET /subsonic/rest/getAlbum)
         subsonicGroup.MapGet("getAlbum",
@@ -157,8 +145,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbum")
-            .WithSummary("Returns details for an album, including a list of songs")
-            .WithOpenApi();
+            .WithSummary("Returns details for an album, including a list of songs");
 
         // GetArtistInfo endpoint - returns artist info with biography, image URLs and similar artists (GET /subsonic/rest/getArtistInfo)
         subsonicGroup.MapGet("getArtistInfo",
@@ -170,8 +157,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtistInfo")
-            .WithSummary("Returns artist info with biography, image URLs and similar artists")
-            .WithOpenApi();
+            .WithSummary("Returns artist info with biography, image URLs and similar artists");
 
         // GetArtistInfo2 endpoint - similar to getArtistInfo but organizes music according to ID3 tags (GET /subsonic/rest/getArtistInfo2)
         subsonicGroup.MapGet("getArtistInfo2",
@@ -183,8 +169,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetArtistInfo2")
-            .WithSummary("Returns artist info with biography, image URLs and similar artists organized by ID3 tags")
-            .WithOpenApi();
+            .WithSummary("Returns artist info with biography, image URLs and similar artists organized by ID3 tags");
 
         // GetPlaylists endpoint - returns all playlists (GET /subsonic/rest/getPlaylists)
         subsonicGroup.MapGet("getPlaylists",
@@ -196,8 +181,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetPlaylists")
-            .WithSummary("Returns all playlists")
-            .WithOpenApi();
+            .WithSummary("Returns all playlists");
 
         // GetPlaylist endpoint - returns a single playlist with songs (GET /subsonic/rest/getPlaylist)
         subsonicGroup.MapGet("getPlaylist",
@@ -209,8 +193,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetPlaylist")
-            .WithSummary("Returns a single playlist with its songs")
-            .WithOpenApi();
+            .WithSummary("Returns a single playlist with its songs");
 
         // GetAlbumList endpoint - returns a list of albums based on various criteria (GET /subsonic/rest/getAlbumList)
         subsonicGroup.MapGet("getAlbumList",
@@ -222,8 +205,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbumList")
-            .WithSummary("Returns a list of albums based on various criteria")
-            .WithOpenApi();
+            .WithSummary("Returns a list of albums based on various criteria");
 
         // GetAlbumList2 endpoint - similar to getAlbumList, but organizes music according to ID3 tags (GET /subsonic/rest/getAlbumList2)
         subsonicGroup.MapGet("getAlbumList2",
@@ -235,8 +217,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetAlbumList2")
-            .WithSummary("Returns a list of albums based on various criteria, organized according to ID3 tags")
-            .WithOpenApi();
+            .WithSummary("Returns a list of albums based on various criteria, organized according to ID3 tags");
 
         // GetBookmarks endpoint - returns all bookmarks (GET /subsonic/rest/getBookmarks)
         subsonicGroup.MapGet("getBookmarks",
@@ -249,8 +230,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetBookmarks")
-            .WithSummary("Returns all bookmarks")
-            .WithOpenApi();
+            .WithSummary("Returns all bookmarks");
 
         // GetStarred endpoint - returns starred songs, albums and artists (GET /subsonic/rest/getStarred)
         subsonicGroup.MapGet("getStarred",
@@ -262,8 +242,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred")
-            .WithSummary("Returns starred songs, albums and artists")
-            .WithOpenApi();
+            .WithSummary("Returns starred songs, albums and artists");
 
         // GetStarred2 endpoint - returns starred songs, albums and artists organized by ID3 tags (GET /subsonic/rest/getStarred2)
         subsonicGroup.MapGet("getStarred2",
@@ -275,8 +254,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetStarred2")
-            .WithSummary("Returns starred songs, albums and artists organized by ID3 tags")
-            .WithOpenApi();
+            .WithSummary("Returns starred songs, albums and artists organized by ID3 tags");
 
         // GetSong endpoint - returns details for a specific song (GET /subsonic/rest/getSong)
         subsonicGroup.MapGet("getSong",
@@ -288,8 +266,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicGetSong")
-            .WithSummary("Returns details for a specific song")
-            .WithOpenApi();
+            .WithSummary("Returns details for a specific song");
 
         // Scrobble endpoint - registers the local playback of a track (GET /subsonic/rest/scrobble)
         subsonicGroup.MapGet("scrobble",
@@ -301,8 +278,31 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicScrobble")
-            .WithSummary("Registers the local playback of a track")
-            .WithOpenApi();
+            .WithSummary("Registers the local playback of a track");
+
+        // Star endpoint - stars songs, albums and artists (GET /subsonic/rest/star)
+        subsonicGroup.MapGet("star",
+                async ([AsParameters]SubsonicStarInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicStarCommand command = new SubsonicStarCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicStar")
+            .WithSummary("Stars songs, albums and artists");
+
+        // Unstar endpoint - unstars songs, albums and artists (GET /subsonic/rest/unstar)
+        subsonicGroup.MapGet("unstar",
+                async ([AsParameters]SubsonicUnstarInput input, IMediator sender, CancellationToken cancellationToken) =>
+                {
+                    SubsonicUnstarCommand command = new SubsonicUnstarCommand(input);
+                    SubsonicBaseResponse result = await sender.Send(command, cancellationToken);
+
+                    return SubsonicResponseHelper.CreateSubsonicResult(result);
+                })
+            .WithName("SubsonicUnstar")
+            .WithSummary("Unstars songs, albums and artists");
 
         // createPlaylist endpoint - creates a new playlist (GET /subsonic/rest/createPlaylist)
         subsonicGroup.MapGet("createPlaylist",
@@ -314,8 +314,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicCreatePlaylist")
-            .WithSummary("Creates a new playlist")
-            .WithOpenApi();
+            .WithSummary("Creates a new playlist");
 
         // updatePlaylist endpoint - updates an existing playlist (GET /subsonic/rest/updatePlaylist)
         subsonicGroup.MapGet("updatePlaylist",
@@ -327,8 +326,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicUpdatePlaylist")
-            .WithSummary("Updates an existing playlist")
-            .WithOpenApi();
+            .WithSummary("Updates an existing playlist");
 
         // deletePlaylist endpoint - deletes an existing playlist (GET /subsonic/rest/deletePlaylist)
         subsonicGroup.MapGet("deletePlaylist",
@@ -340,8 +338,7 @@ internal static class SubsonicEndpoints
                     return SubsonicResponseHelper.CreateSubsonicResult(result);
                 })
             .WithName("SubsonicDeletePlaylist")
-            .WithSummary("Deletes an existing playlist")
-            .WithOpenApi();
+            .WithSummary("Deletes an existing playlist");
 
         // Stream endpoint - streams audio content for a song (GET /subsonic/rest/stream)
         subsonicGroup.MapGet("stream",

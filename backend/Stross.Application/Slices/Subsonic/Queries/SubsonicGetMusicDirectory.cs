@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -31,10 +33,12 @@ internal sealed class SubsonicGetMusicDirectoryQueryValidator : AbstractValidato
 internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<SubsonicGetMusicDirectoryQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetMusicDirectoryQueryHandler(StrossContext context)
+    public SubsonicGetMusicDirectoryQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetMusicDirectoryQuery request, CancellationToken cancellationToken)
@@ -42,6 +46,11 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
         // parse as a long
         if (long.TryParse(request.Input.Id, out long parsedId))
         {
+            Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+            if (currentUser is null)
+                throw new AuthenticationException();
+
             // Check if it's a provider
             Domain.Entities.Provider? provider = await _context.Providers
                 .FirstOrDefaultAsync(p => p.Id == parsedId, cancellationToken);
@@ -69,7 +78,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                             IsDir = true,
                             Artist = c.Name,
                             CoverArt = c.Id.ToString(),
-                            Duration = c.MusicTracks.Sum(m => m.Duration),
+                            Duration = c.MusicTracks.Sum(m => m.Duration)
                         }).ToList()
                     }
                 };
@@ -96,6 +105,8 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                 ExternalCreator? externalRelation = creator.ExternalCreators.FirstOrDefault();
                 string parentId = externalRelation?.ProviderId.ToString() ?? "1";
 
+                StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
                 Response response = new Response
                 {
                     Directory = new Directory
@@ -103,7 +114,7 @@ internal sealed class SubsonicGetMusicDirectoryQueryHandler : IRequestHandler<Su
                         Id = creator.Id.ToString(),
                         Name = creator.Name,
                         Parent = parentId,
-                        Child = musicTracksForCreator.Select(t => t.ToSubsonicSongResponse()).ToList()
+                        Child = musicTracksForCreator.Select(t => t.ToSubsonicSongResponse(starredData.StarredTracks.GetValueOrDefault(t.Id))).ToList()
                     }
                 };
 

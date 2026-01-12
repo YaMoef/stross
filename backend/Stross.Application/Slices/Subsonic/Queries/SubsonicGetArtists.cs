@@ -1,10 +1,13 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
 using Stross.Domain.Entities;
+using Stross.Exception.Exceptions;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 
@@ -25,14 +28,21 @@ internal sealed class SubsonicGetArtistsQueryValidator : AbstractValidator<Subso
 internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicGetArtistsQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetArtistsQueryHandler(StrossContext context)
+    public SubsonicGetArtistsQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetArtistsQuery request, CancellationToken cancellationToken)
     {
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
+
         // Build the query for creators (artists)
         IQueryable<Creator> creatorsQuery = _context.Creators
             .Include(c => c.Albums)
@@ -51,13 +61,15 @@ internal sealed class SubsonicGetArtistsQueryHandler : IRequestHandler<SubsonicG
         // Group creators by first letter (ignoring articles) - same logic as getIndexes but for ID3
         Dictionary<string, List<Creator>> groupedCreators = GroupCreatorsByFirstLetter(creators);
 
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
         // Convert to response format using ID3 response models
         List<IndexId3> indexes = groupedCreators
             .OrderBy(kvp => kvp.Key)
             .Select(kvp => new IndexId3
             {
                 Name = kvp.Key,
-                Artist = kvp.Value.Select(c => c.ToSubsonicArtistID3Response()).ToList()
+                Artist = kvp.Value.Select(c => c.ToSubsonicArtistID3Response(starredData.StarredArtists.GetValueOrDefault(c.Id))).ToList()
             })
             .ToList();
 

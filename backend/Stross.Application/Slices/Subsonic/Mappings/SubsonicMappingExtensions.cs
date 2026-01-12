@@ -24,7 +24,7 @@ public static class SubsonicMappingExtensions
             return response;
         }
 
-        public static PlaylistWithSongs ToSubsonicPlaylistWithSongsResponse(this Domain.Entities.Playlist playlist)
+        public static PlaylistWithSongs ToSubsonicPlaylistWithSongsResponse(this Domain.Entities.Playlist playlist, Dictionary<long, DateTime>? starredSongs)
         {
             SubsonicModels.Playlist playlistResponse = playlist.ToSubsonicPlaylistResponse();
 
@@ -42,35 +42,38 @@ public static class SubsonicMappingExtensions
                 CoverArt = playlistResponse.CoverArt,
                 Entry = playlist.PlaylistMusicTracks
                     .OrderBy(t => t.Order)
-                    .Select(t => t.MusicTrack.ToSubsonicSongResponse())
+                    .Select(t => t.MusicTrack.ToSubsonicSongResponse(starredSongs?.GetValueOrDefault(t.MusicTrackId)))
                     .ToList()
             };
 
             return response;
         }
 
-    public static Artist ToSubsonicArtistResponse(this Creator creator)
+    public static Artist ToSubsonicArtistResponse(this Creator creator, DateTime? starredDate )
     {
-        return new Artist
+        Artist artist = new Artist
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
-            // StarredSpecified = 
-            // Starred = null, // TODO: Implement starring functionality
             ArtistImageUrl = "/api/v1/thumbnails/creator/" + creator.Id + "?type=thumbnail"
             // UserRatingSpecified = 
             // UserRating = null, // TODO: Implement user rating functionality
             // AverageRating = null // TODO: Implement average rating functionality
             // AverageRatingSpecified = 
         };
+
+        if (starredDate is not null)
+            artist.Starred = starredDate.Value;
+        
+        return artist;
     }
 
-    public static Child ToSubsonicSongResponse(this Domain.Entities.MusicTrack musicTrack)
+    public static Child ToSubsonicSongResponse(this Domain.Entities.MusicTrack musicTrack, DateTime? starredDate )
     {
         string? artistName = musicTrack.Creators.FirstOrDefault()?.Name;
         string? artistId = musicTrack.Creators.FirstOrDefault()?.Id.ToString();
 
-        return new Child
+        Child child = new Child
         {
             Id = musicTrack.Id.ToString(),
             Parent = artistId,
@@ -92,19 +95,28 @@ public static class SubsonicMappingExtensions
             Genre = musicTrack.GenreId.ToString(),
             Type = MediaType.Music
         };
+
+        if (starredDate is not null)
+            child.Starred = starredDate.Value;
+        
+        return child;
     }
 
-    public static ArtistId3 ToSubsonicArtistID3Response(this Creator creator)
+    public static ArtistId3 ToSubsonicArtistID3Response(this Creator creator, DateTime? starredDate )
     {
-        return new ArtistId3
+        ArtistId3 artist = new ArtistId3
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
             CoverArt = creator.Id.ToString(),
             ArtistImageUrl = "/api/v1/thumbnails/creator/" + creator.Id + "?type=thumbnail",
-            AlbumCount = creator.Albums.Count
-            // Starred = null // TODO: Implement starring functionality
+            AlbumCount = creator.Albums.Count,
         };
+
+        if (starredDate is not null)
+            artist.Starred = starredDate.Value;
+
+        return artist;
     }
 
     public static MusicFolder ToSubsonicMusicFolderResponse(this Domain.Entities.Provider provider)
@@ -128,35 +140,43 @@ public static class SubsonicMappingExtensions
         };
     }
 
-    public static Artist ToSubsonicIndexArtistResponse(this Creator creator)
+    public static Artist ToSubsonicIndexArtistResponse(this Creator creator, DateTime? starredDate )
     {
-        return new Artist
+        Artist artist = new Artist
         {
             Id = creator.Id.ToString(),
-            Name = creator.Name
-            // Starred = null // TODO: Implement starring functionality
+            Name = creator.Name,
         };
+        
+        if( starredDate is not null)
+            artist.Starred = starredDate.Value;
+
+        return artist;
     }
 
-    public static ArtistWithAlbumsId3 ToSubsonicArtistWithAlbumsResponse(this Creator creator)
+    public static ArtistWithAlbumsId3 ToSubsonicArtistWithAlbumsResponse(this Creator creator, DateTime? starredDate , Dictionary<long, DateTime>? starredAlbums )
     {
-        return new ArtistWithAlbumsId3
+        ArtistWithAlbumsId3 artist = new ArtistWithAlbumsId3
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
             ArtistImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=thumbnail",
             CoverArt = creator.Id.ToString(),
             AlbumCount = creator.Albums.Count,
-            Album = creator.Albums.Select(a => a.ToSubsonicAlbumId3Response()).ToList()
-            // Starred = null // TODO: Implement starring functionality
+            Album = creator.Albums.Select(a => a.ToSubsonicAlbumId3Response(starredAlbums?.GetValueOrDefault(a.Id))).ToList(),
         };
+
+        if (starredDate is not null)
+            artist.Starred = starredDate.Value;
+        
+        return artist;
     }
 
-    public static AlbumId3 ToSubsonicAlbumId3Response(this Album album)
+    public static AlbumId3 ToSubsonicAlbumId3Response(this Album album, DateTime? starredDate )
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 
-        return new AlbumId3
+        AlbumId3 albumTransformed = new AlbumId3
         {
             Id = album.Id.ToString(),
             Name = album.Name,
@@ -167,15 +187,20 @@ public static class SubsonicMappingExtensions
             Duration = album.MusicTracks.Sum(m => m.Duration),
             Created = album.CreatedAt,
             // Year = null, // TODO: Extract year from album metadata
-            Genre = album.Genre!.Name
+            Genre = album.Genre!.Name,
         };
+
+        if (starredDate is not null)
+            albumTransformed.Starred = starredDate.Value;
+        
+        return albumTransformed;
     }
 
-    public static AlbumWithSongsId3 ToSubsonicAlbumWithSongsResponse(this Album album)
+    public static AlbumWithSongsId3 ToSubsonicAlbumWithSongsResponse(this Album album, DateTime? albumStarredDate , Dictionary<long, DateTime>? starredSongs )
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 
-        return new AlbumWithSongsId3
+        AlbumWithSongsId3 albumTransformed = new AlbumWithSongsId3
         {
             Id = album.Id.ToString(),
             Name = album.Name,
@@ -185,17 +210,22 @@ public static class SubsonicMappingExtensions
             SongCount = album.MusicTracks.Count,
             Duration = album.MusicTracks.Sum(m => m.Duration),
             Created = album.CreatedAt,
-            Song = album.MusicTracks.Select(t => t.ToSubsonicSongResponse()).ToList(),
+            Song = album.MusicTracks.Select(t => t.ToSubsonicSongResponse(starredSongs?.GetValueOrDefault(t.Id))).ToList(),
             // Year = null, // TODO: Extract year from album metadata
-            Genre = album.Genre!.Name
+            Genre = album.Genre!.Name,
         };
+
+        if (albumStarredDate is not null)
+            albumTransformed.Starred = albumStarredDate.Value;
+
+        return albumTransformed;
     }
 
-    public static Child ToSubsonicAlbumListResponse(this Album album)
+    public static Child ToSubsonicAlbumListResponse(this Album album, DateTime? starredDate )
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 
-        return new Child
+        Child child = new Child
         {
             Id = album.Id.ToString(),
             Title = album.Name,
@@ -211,6 +241,11 @@ public static class SubsonicMappingExtensions
             Duration = album.MusicTracks.Sum(m => m.Duration),
             Size = album.MusicTracks.Sum(m => m.Size)
         };
+
+        if (starredDate is not null)
+            child.Starred = starredDate.Value;
+
+        return child;
     }
 
     private static string? GetContentTypeFromExtension(string? extension)

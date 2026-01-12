@@ -101,7 +101,7 @@ internal sealed class SubsonicUpdatePlaylistCommandHandler : IRequestHandler<Sub
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse();
+        PlaylistWithSongs subsonicPlaylist = playlist.ToSubsonicPlaylistWithSongsResponse(null);
 
         Response response = new Response
         {

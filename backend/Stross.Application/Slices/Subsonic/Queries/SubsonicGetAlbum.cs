@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stross.Abstractions.Accessors;
+using Stross.Application.Slices.Subsonic.Helpers;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
@@ -30,10 +32,12 @@ internal sealed class SubsonicGetAlbumQueryValidator : AbstractValidator<Subsoni
 internal sealed class SubsonicGetAlbumQueryHandler : IRequestHandler<SubsonicGetAlbumQuery, SubsonicBaseResponse>
 {
     private readonly StrossContext _context;
+    private readonly IUserAccessor _userAccessor;
 
-    public SubsonicGetAlbumQueryHandler(StrossContext context)
+    public SubsonicGetAlbumQueryHandler(StrossContext context, IUserAccessor userAccessor)
     {
         _context = context;
+        _userAccessor = userAccessor;
     }
 
     public async Task<SubsonicBaseResponse> Handle(SubsonicGetAlbumQuery request, CancellationToken cancellationToken)
@@ -42,28 +46,33 @@ internal sealed class SubsonicGetAlbumQueryHandler : IRequestHandler<SubsonicGet
 
         // Try to parse the album ID
         if (!long.TryParse(albumId, out long parsedAlbumId))
-        {
             throw new EntityNotFoundException($"Invalid album ID: {albumId}");
-        }
+
+        Domain.Entities.User? currentUser = await _userAccessor.GetCurrentUserAsync(cancellationToken);
+
+        if (currentUser is null)
+            throw new AuthenticationException();
 
         // Get the album with its songs and creators
         Album? album = await _context.Albums
             .Include(a => a.MusicTracks)
-                .ThenInclude(mt => mt.Creators)
+            .ThenInclude(mt => mt.Creators)
             .Include(a => a.MusicTracks)
-                .ThenInclude(mt => mt.Provider)
+            .ThenInclude(mt => mt.Provider)
             .Include(a => a.Creators)
             .Include(a => a.Genre)
             .FirstOrDefaultAsync(a => a.Id == parsedAlbumId, cancellationToken);
 
         if (album is null)
-        {
             throw new EntityNotFoundException($"Album with ID {albumId} not found");
-        }
+
+        StarredData starredData = await StarredDataHelper.LoadStarredDataForUserAsync(_context, currentUser.Id, cancellationToken);
+
+        DateTime? albumStarredDate = starredData.StarredAlbums.GetValueOrDefault(album.Id);
 
         Response response = new Response
         {
-            Album = album.ToSubsonicAlbumWithSongsResponse()
+            Album = album.ToSubsonicAlbumWithSongsResponse(albumStarredDate, starredData.StarredTracks)
         };
 
         return new SubsonicBaseResponse(response);
