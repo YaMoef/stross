@@ -108,6 +108,9 @@ public class YtDlp
 
         string? channelTitle = doc.Root?.Element(atom + "title")?.Value;
 
+        if(string.IsNullOrWhiteSpace(channelTitle))
+            throw new YtDlpException("Failed to get channel title");
+
         return channelTitle;
     }
 

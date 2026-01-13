@@ -357,7 +357,6 @@ internal static class SubsonicEndpoints
                 })
             .WithName("SubsonicStream")
             .WithSummary("Streams audio content for a song")
-            .WithOpenApi()
             .Produces(200)
             .Produces(404)
             .ProducesValidationProblem();
@@ -378,7 +377,6 @@ internal static class SubsonicEndpoints
                 })
             .WithName("SubsonicDownload")
             .WithSummary("Downloads audio files for a song")
-            .WithOpenApi()
             .Produces(200)
             .Produces(404)
             .ProducesValidationProblem();
@@ -399,7 +397,6 @@ internal static class SubsonicEndpoints
                 })
             .WithName("SubsonicGetCoverArt")
             .WithSummary("Returns cover art images for songs, albums, or artists")
-            .WithOpenApi()
             .Produces(200, contentType:"image/jpeg")
             .Produces(200, contentType:"image/png")
             .Produces(404)

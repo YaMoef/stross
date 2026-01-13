@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Stross.Downloader.Soundcloud-3951b7f2-4b08-4732-9e57-670754f98ec2</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
@@ -16,13 +17,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Stross.Config\Stross.Config.csproj" />
+      <ProjectReference Include="..\Stross.Proto\Stross.Proto.csproj" />
+    </ItemGroup>
 </Project>
