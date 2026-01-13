@@ -46,13 +46,21 @@ jobs:
           push: true
           tags: "${{ vars.DOCKER_API_REPOSITORY }}:${{ steps.extract_tag.outputs.tag }}"
 
-      - name: Build and push downloader yt Docker image
+      - name: Build and push downloader YT Docker image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Stross.Downloader.YT/Dockerfile
           push: true
           tags: "${{ vars.DOCKER_DOWNLOADER_YT_REPOSITORY }}:${{ steps.extract_tag.outputs.tag }}"
+
+      - name: Build and push downloader SoundCloud Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Stross.Downloader.SoundCloud/Dockerfile
+          push: true
+          tags: "${{ vars.DOCKER_DOWNLOADER_SOUNDCLOUD_REPOSITORY }}:${{ steps.extract_tag.outputs.tag }}"
 
       - name: Get ssh host key for gitea
         if: github.ref == 'refs/heads/main'
@@ -76,6 +84,7 @@ jobs:
 
           # Search and replace the image tag with the new tag
           find . -name "*stross_dev-compose.yaml" -exec sed -i 's|${{ vars.COMPOSE_DOWNLOADER_YT_REPLACE_REGEX }}${{ steps.extract_tag.outputs.tag }}|g' {} +
+          find . -name "*stross_dev-compose.yaml" -exec sed -i 's|${{ vars.COMPOSE_DOWNLOADER_SOUNDCLOUD_REPLACE_REGEX }}${{ steps.extract_tag.outputs.tag }}|g' {} +
           find . -name "*stross_dev-compose.yaml" -exec sed -i 's|${{ vars.COMPOSE_API_REPLACE_REGEX }}${{ steps.extract_tag.outputs.tag }}|g' {} +
 
           # Commit and push changes
