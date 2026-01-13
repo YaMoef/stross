@@ -10,21 +10,21 @@ RUN curl -L -o /usr/local/bin/yt-dlp "https://github.com/yt-dlp/yt-dlp/releases/
 
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Stross.Downloader.Soundcloud/Stross.Downloader.Soundcloud.csproj", "Stross.Downloader.Soundcloud/"]
+COPY ["Stross.Downloader.SoundCloud/Stross.Downloader.SoundCloud.csproj", "Stross.Downloader.SoundCloud/"]
 COPY ["Stross.Config/Stross.Config.csproj", "Stross.Config/"]
 COPY ["Stross.Proto/Stross.Proto.csproj", "Stross.Proto/"]
-RUN dotnet restore "Stross.Downloader.Soundcloud/Stross.Downloader.Soundcloud.csproj"
+RUN dotnet restore "Stross.Downloader.SoundCloud/Stross.Downloader.SoundCloud.csproj"
 COPY . .
-WORKDIR "/src/Stross.Downloader.Soundcloud"
-RUN dotnet build "./Stross.Downloader.Soundcloud.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Stross.Downloader.SoundCloud"
+RUN dotnet build "./Stross.Downloader.SoundCloud.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Stross.Downloader.Soundcloud.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Stross.Downloader.SoundCloud.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 
 COPY --from=build /usr/local/bin/yt-dlp /usr/local/bin/yt-dlp
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Stross.Downloader.Soundcloud.dll"]
+ENTRYPOINT ["dotnet", "Stross.Downloader.SoundCloud.dll"]
