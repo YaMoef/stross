@@ -58,7 +58,7 @@ public class SoundCloud
             ? trackData.Title.Substring(0, trackData.Title.Length - creatorMetadata.Name.Length - 4)
             : trackData.Title;
 
-        await DownloadThumbnailFromUrlAsync(TransformThumbnailUrl(trackData.ThumbnailUrl), fullOutputPathThumbnail, cancellationToken);
+        await DownloadTrackThumbnail(trackData.ThumbnailUrl, fullOutputPathThumbnail, cancellationToken);
 
         _logger.LogDebug("Done loading metadata");
 
@@ -99,6 +99,25 @@ public class SoundCloud
         SoundCloudEmbed data = await GetSoundCloudEmbedDataAsync(url, cancellationToken);
 
         return new CreatorMetadata(data.Title, url, creatorId, TransformThumbnailUrl(data.ThumbnailUrl));
+    }
+
+    private async Task<bool> DownloadTrackThumbnail(string originalTrackThumbnailUrl, string outputPath, CancellationToken cancellationToken = default)
+    {
+        string originalJpgThumbnail = TransformThumbnailUrl(originalTrackThumbnailUrl);
+
+        if (await DownloadThumbnailFromUrlAsync(originalJpgThumbnail, outputPath, cancellationToken))
+            return true;
+
+        _logger.LogWarning("Failed to download original jpg thumbnail for URL: {Url}", originalTrackThumbnailUrl);
+
+        string originalPngThumbnail = originalTrackThumbnailUrl.Replace(".jpg", ".png");
+
+        if (await DownloadThumbnailFromUrlAsync(originalPngThumbnail, outputPath, cancellationToken))
+            return true;
+
+        _logger.LogWarning("Failed to download original png thumbnail for URL: {Url}", originalTrackThumbnailUrl);
+
+        return await DownloadThumbnailFromUrlAsync(originalTrackThumbnailUrl, outputPath, cancellationToken);
     }
 
     private async Task<bool> DownloadThumbnailFromUrlAsync(string thumbnailUrl, string outputPath, CancellationToken cancellationToken = default)
