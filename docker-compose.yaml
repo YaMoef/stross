@@ -1,0 +1,50 @@
+services:
+  stross.api:
+    container_name: stross.api
+    restart: unless-stopped
+    build: 
+      context: backend
+      dockerfile: Stross.API/Dockerfile
+    volumes:
+      - ./docker-testing/data:/app/downloads
+    environment:
+      - StrossStorageConfig__BasePath=/app/downloads
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DatabaseConfig__ConnectionString=Server=stross.db;Port=5432;Database=strossdb;User Id=sa;Password=Test123456789.
+    ports:
+      - 8080:8080
+
+  stross.downloader.yt:
+    container_name: stross.downloader.yt
+    restart: unless-stopped
+    build: 
+      context: backend
+      dockerfile: Stross.Downloader.YT/Dockerfile
+    volumes:
+      - ./docker-testing/data:/app/downloads
+    environment:
+      - DownloaderConfig__OutputPath=/app/downloads
+
+  stross.downloader.soundcloud:
+    container_name: stross.downloader.soundcloud
+    restart: unless-stopped
+    build: 
+      context: backend
+      dockerfile: Stross.Downloader.SoundCloud/Dockerfile
+    volumes:
+      - ./docker-testing/data:/app/downloads
+    environment:
+      - DownloaderConfig__OutputPath=/app/downloads
+
+  stross.db:
+    container_name: stross.db
+    restart: unless-stopped
+    image: postgres:18
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker-testing/db:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=sa
+      - POSTGRES_DB=strossdb
+      - POSTGRES_PASSWORD=Test123456789.
