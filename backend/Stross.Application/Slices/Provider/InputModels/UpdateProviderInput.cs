@@ -3,11 +3,11 @@ using Stross.Infrastructure.EntityTypeConfigurations;
 
 namespace Stross.Application.Slices.Provider.InputModels;
 
-public sealed record AddProviderInput(string Name, string Url);
+public sealed record UpdateProviderInput(string Name, string Url, bool Enabled);
 
-internal sealed class AddProviderInputValidator : AbstractValidator<AddProviderInput>
+internal sealed class UpdateProviderInputValidator : AbstractValidator<UpdateProviderInput>
 {
-    public AddProviderInputValidator()
+    public UpdateProviderInputValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()

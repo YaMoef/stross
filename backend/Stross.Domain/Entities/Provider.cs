@@ -12,10 +12,24 @@ public class Provider : BaseEntity
     {
     }
 
-
     public Provider(string name, string url)
     {
         Name = name;
         Url = url;
+    }
+
+    public void SetName(string name)
+    {
+        Name = name;
+    }
+
+    public void SetUrl(string url)
+    {
+        Url = url;
+    }
+
+    public void SetEnabled(bool enabled)
+    {
+        Enabled = enabled;
     }
 }
