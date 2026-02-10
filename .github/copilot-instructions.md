@@ -94,42 +94,71 @@ public class Order : AggregateRoot
 - Use MediatR for implementing CQRS pattern
 - Separate Commands and Queries
 - Implement validation using FluentValidation
-- Use the Repository pattern for data access abstractions
+- Use StrossContext directly in handlers - no repository abstraction layer
 - Handle cross-cutting concerns with Pipeline Behaviors
+- FluentValidation validators are auto-registered from the assembly
+- Each command/query has a validator that delegates validation to the input model's validator
 
 ### MediatR Implementation Guidelines
 
 #### Commands (Write Operations)
 ```csharp
-public record CreateOrderCommand(Guid CustomerId, List<OrderItemDto> Items) : IRequest<CreateOrderResponse>;
+public sealed record CreateOrderCommand(CreateOrderInput Input) : IRequest<CreateOrderResponse>;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, CreateOrderResponse>
+internal sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, CreateOrderResponse>
 {
-    private readonly IOrderRepository _orderRepository;
-    private readonly IMapper _mapper;
+    private readonly StrossContext _context;
     
-    public CreateOrderCommandHandler(IOrderRepository orderRepository, IMapper mapper)
+    public CreateOrderCommandHandler(StrossContext context)
     {
-        _orderRepository = orderRepository;
-        _mapper = mapper;
+        _context = context;
     }
     
     public async Task<CreateOrderResponse> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        // Implementation here
+        // Implementation here using _context directly
         
         return createOrderResponse;
+    }
+}
+
+public sealed class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
+{
+    public CreateOrderCommandValidator(IValidator<CreateOrderInput> inputValidator)
+    {
+        RuleFor(command => command.Input)
+            .SetValidator(inputValidator);
+    }
+}
+
+public sealed class CreateOrderInputValidator : AbstractValidator<CreateOrderInput>
+{
+    public CreateOrderInputValidator()
+    {
+        // Validation rules here
     }
 }
 ```
 
 #### Queries (Read Operations)
 ```csharp
-public record GetOrderQuery(Guid OrderId) : IRequest<GetOrderResponse>;
+public sealed record GetOrderQuery(Guid OrderId) : IRequest<GetOrderResponse>;
 
-public class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, GetOrderResponse>
+internal sealed class GetOrderQueryHandler : IRequestHandler<GetOrderQuery, GetOrderResponse>
 {
-    // Implementation
+    private readonly StrossContext _context;
+    
+    public GetOrderQueryHandler(StrossContext context)
+    {
+        _context = context;
+    }
+    
+    public async Task<GetOrderResponse> Handle(GetOrderQuery request, CancellationToken cancellationToken)
+    {
+        // Implementation using _context directly
+        
+        return response;
+    }
 }
 ```
 
@@ -278,22 +307,11 @@ public class DownloaderGrpcClient : IDownloaderService
 #### When creating new features:
 1. **Start with the Domain**: Create entities, value objects, and domain services first
 2. **Define the Contract**: Create minimal API endpoints for HTTP communication (gRPC only for downloader service)
-3. **Implement Application Layer**: Create commands/queries and their handlers
-4. **Add Infrastructure**: Implement repositories and external service integrations
+3. **Implement Application Layer**: Create commands/queries and their handlers using StrossContext directly
+4. **Add Infrastructure**: Implement external service integrations (no repositories needed)
 5. **Create API Endpoints**: Implement minimal API endpoints for the feature
-6. **Add Validation**: Implement FluentValidation rules
+6. **Add Validation**: Implement FluentValidation rules (both command/query validators and input validators)
 7. **Write Tests**: Create unit tests for domain logic and integration tests for handlers
-
-#### Repository Pattern
-```csharp
-public interface IOrderRepository
-{
-    Task<Order?> GetByIdAsync(OrderId id, CancellationToken cancellationToken = default);
-    Task<Order> AddAsync(Order order, CancellationToken cancellationToken = default);
-    Task UpdateAsync(Order order, CancellationToken cancellationToken = default);
-    Task DeleteAsync(OrderId id, CancellationToken cancellationToken = default);
-}
-```
 
 ### Error Handling
 - Throw errors provided by the Stross.Exception project
@@ -318,14 +336,23 @@ public interface IOrderRepository
 - Use HTTPS for all communications
 
 ## File Naming Conventions
-- Commands: `CreateOrderCommand.cs`
-- Queries: `GetOrderQuery.cs`
-- Input Models: `CreateOrderInput.cs`
-- Response Models: `CreateOrderResponse.cs`
+
+### Commands and Queries
+- Commands: `{Verb}{Entity}Command.cs` (e.g., `AddProviderCommand.cs`, `UpdateUserCommand.cs`)
+- Queries: `Get{Entity}Query.cs` or `GetAll{Entity}Query.cs` (e.g., `GetProviderQuery.cs`, `GetAllProvidersQuery.cs`)
+
+### Models
+- Input Models: `{Verb}{Entity}Input.cs` (e.g., `AddProviderInput.cs`, `UpdateUserInput.cs`)
+- Response Models: `{Entity}Response.cs` or `{Entity}DetailsResponse.cs` (e.g., `ProviderResponse.cs`, `UserDetailsResponse.cs`)
+
+### Validators
+- Command/Query Validators: `{CommandOrQuery}Validator.cs` (e.g., `AddProviderCommandValidator.cs`)
+- Input Validators: `{Input}Validator.cs` (e.g., `AddProviderInputValidator.cs`)
+
+### Domain
 - Entities: `Order.cs`
 - Value Objects: `OrderId.cs`
 - Services: `OrderService.cs`
-- Repositories: `IOrderRepository.cs`, `OrderRepository.cs`
 
 ## Common Code Patterns to Follow
 1. Always use CancellationToken in async methods
