@@ -1,4 +1,3 @@
-using System.Xml.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Stross.Domain.Entities;

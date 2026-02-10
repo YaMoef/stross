@@ -4,5 +4,5 @@ namespace Stross.Application.Slices.Subsonic.ResponseModels;
 
 public interface ISubsonicResponse
 {
-    Response Response { get; }
+    public Response Response { get; }
 }

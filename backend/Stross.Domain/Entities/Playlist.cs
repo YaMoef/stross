@@ -62,7 +62,7 @@ public class Playlist : BaseEntity
     {
         PlaylistMusicTrack? entryToDelete = null;
 
-        foreach (var playlistMusicTrack in _playlistMusicTracks.OrderBy(m => m.Order))
+        foreach (PlaylistMusicTrack? playlistMusicTrack in _playlistMusicTracks.OrderBy(m => m.Order))
         {
             if (playlistMusicTrack.Order == order)
                 entryToDelete = playlistMusicTrack;
@@ -81,7 +81,7 @@ public class Playlist : BaseEntity
     {
         List<PlaylistMusicTrack> entriesToDelete = _playlistMusicTracks.Where(m => orders.Contains(m.Order)).ToList();
 
-        foreach (var entryToDelete in entriesToDelete)
+        foreach (PlaylistMusicTrack entryToDelete in entriesToDelete)
         {
             _playlistMusicTracks.Remove(entryToDelete);
         }

@@ -2,7 +2,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Stross.Application.Shared.Helpers;
 using Stross.Application.Slices.MusicTrack.InputModels;
 using Stross.Config;
 using Stross.Domain.Entities;
@@ -13,7 +12,6 @@ using Stross.Infrastructure.Services.AudioFileMetadataService;
 using Stross.Infrastructure.Services.GrpcService;
 using Stross.Infrastructure.Services.GrpcService.Models;
 using Stross.Infrastructure.Services.ThumbnailService;
-using ValidationException = Stross.Exception.Exceptions.ValidationException;
 
 namespace Stross.Application.Slices.MusicTrack.Commands;
 

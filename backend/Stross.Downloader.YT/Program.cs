@@ -1,8 +1,8 @@
-﻿using System.Net;
-using Stross.Downloader.YT.Services;
+using System.Net;
 using Stross.Downloader.YT.Configuration;
 using Stross.Downloader.YT.Constants;
 using Stross.Downloader.YT.Downloaders;
+using Stross.Downloader.YT.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

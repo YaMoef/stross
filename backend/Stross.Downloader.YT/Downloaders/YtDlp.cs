@@ -181,7 +181,6 @@ public class YtDlp
 
             _logger.LogWarning("Failed to download hqdefault thumbnail for videoId: {VideoId}", videoId);
 
-
             thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/mqdefault.jpg";
             isDownloaded = await DownloadThumbnailFromUrlAsync(thumbnailUrl, outputPath, cancellationToken);
 

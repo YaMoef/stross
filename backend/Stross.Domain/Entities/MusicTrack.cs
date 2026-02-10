@@ -21,10 +21,8 @@ public class MusicTrack : BaseEntity
     public Genre? Genre { get; private set; }
     public long GenreId { get; private set; }
 
-
     private readonly List<Creator> _creators = [];
     public IReadOnlyCollection<Creator> Creators => _creators;
-
 
     private MusicTrack()
     {

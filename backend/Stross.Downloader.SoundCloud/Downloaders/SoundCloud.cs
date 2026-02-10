@@ -180,7 +180,7 @@ public class SoundCloud
         if (string.IsNullOrWhiteSpace(url))
             throw new SoundCloudException("SoundCloud URL cannot be null or empty");
 
-        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var uri))
+        if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri))
             throw new SoundCloudException("SoundCloud URL is invalid");
 
         // Reject non-SoundCloud domains (short links handled separately)

@@ -1,6 +1,5 @@
 using Stross.Domain.Entities;
 using Stross.Infrastructure.Services.GrpcService.Models;
-using Stross.Proto;
 
 namespace Stross.Infrastructure.Services.GrpcService;
 

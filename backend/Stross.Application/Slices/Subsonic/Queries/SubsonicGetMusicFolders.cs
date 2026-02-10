@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Stross.Application.Slices.Subsonic.InputModels;
 using Stross.Application.Slices.Subsonic.Mappings;
 using Stross.Application.Slices.Subsonic.ResponseModels;
-using Stross.Domain.Entities;
 using Stross.Infrastructure;
 using Stross.SubsonicModels;
 

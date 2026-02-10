@@ -1,9 +1,8 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Stross.Abstractions.Accessors;
 using Stross.Application.Behaviours;
 using Stross.Application.Slices.Subsonic.Services;
 

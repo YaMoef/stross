@@ -4,6 +4,6 @@ namespace Stross.Application.Slices.Subsonic.Services;
 
 public interface ISubsonicResponseFormatService
 {
-    SubsonicResponseFormat ResponseFormat { get; }
-    void SetResponseFormat(SubsonicResponseFormat format);
+    public SubsonicResponseFormat ResponseFormat { get; }
+    public void SetResponseFormat(SubsonicResponseFormat format);
 }

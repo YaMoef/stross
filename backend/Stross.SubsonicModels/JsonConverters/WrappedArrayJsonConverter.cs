@@ -74,7 +74,7 @@ public class WrappedArrayJsonConverterFactory : JsonConverterFactory
                 if (reader.TokenType == JsonTokenType.EndArray)
                     break;
 
-                var item = JsonSerializer.Deserialize<T>(ref reader, options);
+                T? item = JsonSerializer.Deserialize<T>(ref reader, options);
                 if (item != null)
                     list.Add(item);
             }
@@ -90,7 +90,7 @@ public class WrappedArrayJsonConverterFactory : JsonConverterFactory
             writer.WritePropertyName(_itemName);
             writer.WriteStartArray();
 
-            foreach (var item in value)
+            foreach (T? item in value)
             {
                 JsonSerializer.Serialize(writer, item, options);
             }

@@ -29,7 +29,6 @@ public class UserStarredItem : BaseEntity
         MusicTrackId = musicTrack.Id;
     }
 
-
     public UserStarredItem(User user, Album album)
     {
         User = user;
