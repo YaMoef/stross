@@ -27,7 +27,7 @@ public sealed class SubsonicSearchInputValidator : AbstractValidator<SubsonicSea
             .WithMessage("Offset must be 0 or greater");
 
         RuleFor(x => x)
-            .Must(x => !string.IsNullOrEmpty(x.Artist) || !string.IsNullOrEmpty(x.Album) || 
+            .Must(x => !string.IsNullOrEmpty(x.Artist) || !string.IsNullOrEmpty(x.Album) ||
                       !string.IsNullOrEmpty(x.Title) || !string.IsNullOrEmpty(x.Any))
             .WithMessage("At least one search parameter (Artist, Album, Title, or Any) must be provided");
     }

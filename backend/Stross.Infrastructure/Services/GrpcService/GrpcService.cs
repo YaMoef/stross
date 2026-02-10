@@ -27,7 +27,7 @@ public class GrpcService : IGrpcService
         {
             SourceUrl = sourceUrl,
             TargetLocationPath = targetPath
-        }, cancellationToken:cancellationToken);
+        }, cancellationToken: cancellationToken);
 
         if (!reply.Succeeded)
             throw new ProviderException("Failed to download music track. Reason: " + reply.Error);
@@ -41,10 +41,10 @@ public class GrpcService : IGrpcService
         Downloader.DownloaderClient client = new Downloader.DownloaderClient(channel);
 
         GetCreatorMetadataReply reply = await client.GetCreatorMetadataAsync(new GetCreatorMetadataRequest
-            {
-                CreatorId = creatorId
-            },
-            cancellationToken:cancellationToken);
+        {
+            CreatorId = creatorId
+        },
+            cancellationToken: cancellationToken);
 
         return new FetchedCreatorMetadata(reply.CreatorId, reply.CreatorName, reply.CreatorUrl, reply.CreatorThumbnailImageUrl);
     }
@@ -56,7 +56,7 @@ public class GrpcService : IGrpcService
             using GrpcChannel channel = GrpcChannel.ForAddress(providerUrl);
             Downloader.DownloaderClient client = new Downloader.DownloaderClient(channel);
 
-            PingReply reply = await client.PingAsync(new PingRequest(), cancellationToken:cancellationToken);
+            PingReply reply = await client.PingAsync(new PingRequest(), cancellationToken: cancellationToken);
 
             return reply.Ready;
         }
@@ -81,7 +81,7 @@ public class GrpcService : IGrpcService
         SanitizeSourceUrlReply reply = await client.SanitizeSourceUrlAsync(new SanitizeSourceUrlRequest
         {
             SourceUrl = sourceUrl
-        }, cancellationToken:cancellationToken);
+        }, cancellationToken: cancellationToken);
 
         if (reply.Error == "Invalid URL provided.")
             throw new ValidationException(reply.Error);

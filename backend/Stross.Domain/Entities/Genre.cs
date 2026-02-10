@@ -5,7 +5,7 @@ namespace Stross.Domain.Entities;
 public class Genre : BaseEntity
 {
     public string Name { get; private set; }
-    
+
 
     private readonly List<Album> _albums = [];
 

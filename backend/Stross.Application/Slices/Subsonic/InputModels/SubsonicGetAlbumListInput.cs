@@ -14,17 +14,17 @@ public sealed record SubsonicGetAlbumListInput(
 
 internal sealed class SubsonicGetAlbumListInputValidator : AbstractValidator<SubsonicGetAlbumListInput>
 {
-    private static readonly string[] ValidTypes = 
+    private static readonly string[] ValidTypes =
     {
-        "random", 
-        "newest", 
-        "highest", 
-        "frequent", 
-        "recent", 
-        "alphabeticalByName", 
-        "alphabeticalByArtist", 
-        "starred", 
-        "byYear", 
+        "random",
+        "newest",
+        "highest",
+        "frequent",
+        "recent",
+        "alphabeticalByName",
+        "alphabeticalByArtist",
+        "starred",
+        "byYear",
         "byGenre"
     };
 

@@ -20,7 +20,7 @@ public sealed class SubsonicUpdatePlaylistInputValidator : AbstractValidator<Sub
         RuleFor(input => input.Comment)
             .MaximumLength(PlaylistConfiguration.CommentMaxLength)
             .When(input => input.Comment is not null);
-        
+
         RuleFor(input => input.Description)
             .MaximumLength(PlaylistConfiguration.CommentMaxLength)
             .When(input => input.Description is not null);

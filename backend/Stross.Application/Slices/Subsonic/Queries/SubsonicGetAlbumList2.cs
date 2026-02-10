@@ -51,13 +51,13 @@ internal sealed class SubsonicGetAlbumList2QueryHandler : IRequestHandler<Subson
         // Filter by music folder if specified
         if (!string.IsNullOrEmpty(request.Input.MusicFolderId) && int.TryParse(request.Input.MusicFolderId, out int musicFolderId))
         {
-            albumsQuery = albumsQuery.Where(a => 
+            albumsQuery = albumsQuery.Where(a =>
                 a.MusicTracks.Any(mt => mt.ProviderId == musicFolderId));
         }
 
         // Apply type-specific filtering and ordering (ID3-based organization)
         string type = request.Input.Type.ToLowerInvariant();
-        
+
         albumsQuery = type switch
         {
             "random" => albumsQuery.OrderBy(a => Guid.NewGuid()),

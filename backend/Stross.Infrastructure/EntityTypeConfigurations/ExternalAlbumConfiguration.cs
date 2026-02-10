@@ -52,10 +52,10 @@ public sealed class ExternalAlbumConfiguration : BaseEntityConfiguration<Externa
 
         // Index for performance and uniqueness
         builder.HasIndex(x => new
-            {
-                x.ProviderId,
-                x.ExternalId
-            })
+        {
+            x.ProviderId,
+            x.ExternalId
+        })
             .IsUnique()
             .HasDatabaseName("IX_ExternalAlbums_Provider_ExternalId_Unique");
 

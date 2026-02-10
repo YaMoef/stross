@@ -40,7 +40,7 @@ internal sealed class SubsonicGetPlaylistsQueryHandler : IRequestHandler<Subsoni
 
         if (currentUser is null)
             throw new AuthenticationException();
-        
+
         List<Domain.Entities.Playlist> publicPlaylists = await _context.Playlists
             .Include(p => p.Owner)
             .Include(p => p.PlaylistMusicTracks)

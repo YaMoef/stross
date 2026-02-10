@@ -5,51 +5,51 @@ namespace Stross.Application.Slices.Subsonic.Mappings;
 
 public static class SubsonicMappingExtensions
 {
-        public static SubsonicModels.Playlist ToSubsonicPlaylistResponse(this Domain.Entities.Playlist playlist)
+    public static SubsonicModels.Playlist ToSubsonicPlaylistResponse(this Domain.Entities.Playlist playlist)
+    {
+        SubsonicModels.Playlist response = new SubsonicModels.Playlist
         {
-            SubsonicModels.Playlist response = new SubsonicModels.Playlist
-            {
-                Id = playlist.Id.ToString(),
-                Name = playlist.Name,
-                Comment = playlist.Comment,
-                Owner = playlist.Owner.UserName,
-                Public = playlist.Public,
-                SongCount = playlist.SongCount,
-                Duration = playlist.Duration,
-                Created = playlist.CreatedAt,
-                Changed = playlist.UpdatedAt ?? playlist.CreatedAt,
-                CoverArt = playlist.CoverArtLocation
-            };
+            Id = playlist.Id.ToString(),
+            Name = playlist.Name,
+            Comment = playlist.Comment,
+            Owner = playlist.Owner.UserName,
+            Public = playlist.Public,
+            SongCount = playlist.SongCount,
+            Duration = playlist.Duration,
+            Created = playlist.CreatedAt,
+            Changed = playlist.UpdatedAt ?? playlist.CreatedAt,
+            CoverArt = playlist.CoverArtLocation
+        };
 
-            return response;
-        }
+        return response;
+    }
 
-        public static PlaylistWithSongs ToSubsonicPlaylistWithSongsResponse(this Domain.Entities.Playlist playlist, Dictionary<long, DateTime>? starredSongs)
+    public static PlaylistWithSongs ToSubsonicPlaylistWithSongsResponse(this Domain.Entities.Playlist playlist, Dictionary<long, DateTime>? starredSongs)
+    {
+        SubsonicModels.Playlist playlistResponse = playlist.ToSubsonicPlaylistResponse();
+
+        PlaylistWithSongs response = new PlaylistWithSongs
         {
-            SubsonicModels.Playlist playlistResponse = playlist.ToSubsonicPlaylistResponse();
+            Id = playlistResponse.Id,
+            Name = playlistResponse.Name,
+            Comment = playlistResponse.Comment,
+            Owner = playlistResponse.Owner,
+            Public = playlistResponse.Public,
+            SongCount = playlistResponse.SongCount,
+            Duration = playlistResponse.Duration,
+            Created = playlistResponse.Created,
+            Changed = playlistResponse.Changed,
+            CoverArt = playlistResponse.CoverArt,
+            Entry = playlist.PlaylistMusicTracks
+                .OrderBy(t => t.Order)
+                .Select(t => t.MusicTrack.ToSubsonicSongResponse(starredSongs?.GetValueOrDefault(t.MusicTrackId)))
+                .ToList()
+        };
 
-            PlaylistWithSongs response = new PlaylistWithSongs
-            {
-                Id = playlistResponse.Id,
-                Name = playlistResponse.Name,
-                Comment = playlistResponse.Comment,
-                Owner = playlistResponse.Owner,
-                Public = playlistResponse.Public,
-                SongCount = playlistResponse.SongCount,
-                Duration = playlistResponse.Duration,
-                Created = playlistResponse.Created,
-                Changed = playlistResponse.Changed,
-                CoverArt = playlistResponse.CoverArt,
-                Entry = playlist.PlaylistMusicTracks
-                    .OrderBy(t => t.Order)
-                    .Select(t => t.MusicTrack.ToSubsonicSongResponse(starredSongs?.GetValueOrDefault(t.MusicTrackId)))
-                    .ToList()
-            };
+        return response;
+    }
 
-            return response;
-        }
-
-    public static Artist ToSubsonicArtistResponse(this Creator creator, DateTime? starredDate )
+    public static Artist ToSubsonicArtistResponse(this Creator creator, DateTime? starredDate)
     {
         Artist artist = new Artist
         {
@@ -64,11 +64,11 @@ public static class SubsonicMappingExtensions
 
         if (starredDate is not null)
             artist.Starred = starredDate.Value;
-        
+
         return artist;
     }
 
-    public static Child ToSubsonicSongResponse(this Domain.Entities.MusicTrack musicTrack, DateTime? starredDate )
+    public static Child ToSubsonicSongResponse(this Domain.Entities.MusicTrack musicTrack, DateTime? starredDate)
     {
         string? artistName = musicTrack.Creators.FirstOrDefault()?.Name;
         string? artistId = musicTrack.Creators.FirstOrDefault()?.Id.ToString();
@@ -98,11 +98,11 @@ public static class SubsonicMappingExtensions
 
         if (starredDate is not null)
             child.Starred = starredDate.Value;
-        
+
         return child;
     }
 
-    public static ArtistId3 ToSubsonicArtistID3Response(this Creator creator, DateTime? starredDate )
+    public static ArtistId3 ToSubsonicArtistID3Response(this Creator creator, DateTime? starredDate)
     {
         ArtistId3 artist = new ArtistId3
         {
@@ -140,21 +140,21 @@ public static class SubsonicMappingExtensions
         };
     }
 
-    public static Artist ToSubsonicIndexArtistResponse(this Creator creator, DateTime? starredDate )
+    public static Artist ToSubsonicIndexArtistResponse(this Creator creator, DateTime? starredDate)
     {
         Artist artist = new Artist
         {
             Id = creator.Id.ToString(),
             Name = creator.Name,
         };
-        
-        if( starredDate is not null)
+
+        if (starredDate is not null)
             artist.Starred = starredDate.Value;
 
         return artist;
     }
 
-    public static ArtistWithAlbumsId3 ToSubsonicArtistWithAlbumsResponse(this Creator creator, DateTime? starredDate , Dictionary<long, DateTime>? starredAlbums )
+    public static ArtistWithAlbumsId3 ToSubsonicArtistWithAlbumsResponse(this Creator creator, DateTime? starredDate, Dictionary<long, DateTime>? starredAlbums)
     {
         ArtistWithAlbumsId3 artist = new ArtistWithAlbumsId3
         {
@@ -168,11 +168,11 @@ public static class SubsonicMappingExtensions
 
         if (starredDate is not null)
             artist.Starred = starredDate.Value;
-        
+
         return artist;
     }
 
-    public static AlbumId3 ToSubsonicAlbumId3Response(this Album album, DateTime? starredDate )
+    public static AlbumId3 ToSubsonicAlbumId3Response(this Album album, DateTime? starredDate)
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 
@@ -192,11 +192,11 @@ public static class SubsonicMappingExtensions
 
         if (starredDate is not null)
             albumTransformed.Starred = starredDate.Value;
-        
+
         return albumTransformed;
     }
 
-    public static AlbumWithSongsId3 ToSubsonicAlbumWithSongsResponse(this Album album, DateTime? albumStarredDate , Dictionary<long, DateTime>? starredSongs )
+    public static AlbumWithSongsId3 ToSubsonicAlbumWithSongsResponse(this Album album, DateTime? albumStarredDate, Dictionary<long, DateTime>? starredSongs)
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 
@@ -221,7 +221,7 @@ public static class SubsonicMappingExtensions
         return albumTransformed;
     }
 
-    public static Child ToSubsonicAlbumListResponse(this Album album, DateTime? starredDate )
+    public static Child ToSubsonicAlbumListResponse(this Album album, DateTime? starredDate)
     {
         Creator? primaryCreator = album.Creators.FirstOrDefault();
 

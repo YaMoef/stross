@@ -64,7 +64,7 @@ internal sealed class SubsonicGetArtistInfoQueryHandler : IRequestHandler<Subson
             MusicBrainzId = null, // TODO: Implement MusicBrainz integration
             LastFmUrl = null, // TODO: Implement Last.fm integration
             SmallImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=small",
-            MediumImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=medium", 
+            MediumImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=medium",
             LargeImageUrl = $"/api/v1/thumbnails/creator/{creator.Id}?type=large",
             SimilarArtist = similarArtists.Select(a => a.ToSubsonicArtistResponse(null)).ToList()
         };
@@ -81,7 +81,7 @@ internal sealed class SubsonicGetArtistInfoQueryHandler : IRequestHandler<Subson
     {
         // TODO: Implement proper similarity algorithm based on genres, collaborations, etc.
         // For now, just return random other artists
-        
+
         if (!includeNotPresent)
         {
             // Only return artists that have albums/tracks in the library

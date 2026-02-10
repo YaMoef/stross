@@ -76,7 +76,7 @@ public class Playlist : BaseEntity
 
         return this;
     }
-    
+
     public Playlist RemoveMusicTrackByOrders(IReadOnlyCollection<int>? orders)
     {
         List<PlaylistMusicTrack> entriesToDelete = _playlistMusicTracks.Where(m => orders.Contains(m.Order)).ToList();

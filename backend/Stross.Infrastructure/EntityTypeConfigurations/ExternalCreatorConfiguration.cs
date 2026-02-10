@@ -48,10 +48,10 @@ public sealed class ExternalCreatorConfiguration : BaseEntityConfiguration<Exter
 
         // Composite unique index to prevent duplicate external creator entries per provider
         builder.HasIndex(x => new
-            {
-                x.ExternalId,
-                x.ProviderId
-            })
+        {
+            x.ExternalId,
+            x.ProviderId
+        })
             .IsUnique();
     }
 }

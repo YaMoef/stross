@@ -43,7 +43,7 @@ internal sealed class SubsonicCreatePlaylistCommandHandler : IRequestHandler<Sub
             throw new AuthenticationException();
 
         Domain.Entities.Playlist playlist;
-        
+
         if (!string.IsNullOrEmpty(request.Input.PlaylistId))
         {
             if (!long.TryParse(request.Input.PlaylistId, out long parsedId))

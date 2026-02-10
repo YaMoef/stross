@@ -44,7 +44,7 @@ public sealed class AlbumConfiguration : BaseEntityConfiguration<Album>
             .HasForeignKey("AlbumId")
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
-        
+
         // Foreign key relationship with Genre
         builder.HasOne(x => x.Genre)
             .WithMany(g => g.Albums)

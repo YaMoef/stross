@@ -41,7 +41,7 @@ internal sealed class SubsonicUpdatePlaylistCommandHandler : IRequestHandler<Sub
 
         if (currentUser is null)
             throw new AuthenticationException();
-        
+
         if (!long.TryParse(request.Input.PlaylistId, out long playlistId))
             throw new EntityNotFoundException($"Playlist with id {request.Input.PlaylistId} was not found");
 

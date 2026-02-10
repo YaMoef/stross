@@ -17,7 +17,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<User> AuthenticateWithApiKeyAsync(string? username, string? token, string? salt, CancellationToken cancellationToken = default)
     {
-        if(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
             throw new AuthenticationException();
 
         if (string.IsNullOrEmpty(salt) || salt.Length < Domain.Constants.Constants.SaltMinSize)

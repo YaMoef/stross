@@ -7,8 +7,8 @@ using Stross.SubsonicModels;
 namespace Stross.Application.Behaviours;
 
 public class SubsonicBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-where TRequest: IRequest<TResponse>
-where TResponse: class, ISubsonicResponse
+where TRequest : IRequest<TResponse>
+where TResponse : class, ISubsonicResponse
 {
     private readonly ISubsonicResponseFormatService _subsonicContext;
 

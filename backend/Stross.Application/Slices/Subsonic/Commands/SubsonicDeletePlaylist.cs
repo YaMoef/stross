@@ -40,7 +40,7 @@ internal sealed class SubsonicDeletePlaylistCommandHandler : IRequestHandler<Sub
 
         if (currentUser is null)
             throw new AuthenticationException();
-        
+
         if (!long.TryParse(request.Input.Id, out long playlistId))
             throw new EntityNotFoundException($"Playlist with id {request.Input.Id} was not found");
 

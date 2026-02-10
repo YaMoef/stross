@@ -16,7 +16,7 @@ public class SubsonicSuffixMiddleware
     public Task InvokeAsync(HttpContext context)
     {
         string originalPath = context.Request.Path.Value ?? string.Empty;
-        
+
         string cleanedPath = StripFileExtension(originalPath);
 
         if (cleanedPath != originalPath)
