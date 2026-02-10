@@ -11,6 +11,9 @@ internal static class ThumbnailEndpoints
     {
         RouteGroupBuilder thumbnailGroup = endpoints.MapGroup("/thumbnails");
 
+        #region Thumbnail Retrieval
+
+        // Get creator thumbnail endpoint - retrieves thumbnail for a creator (GET /thumbnails/creator/{id})
         thumbnailGroup.MapGet("/creator/{id:long}",
                 async (long id, IMediator sender, CancellationToken cancellationToken) =>
                 {
@@ -29,10 +32,12 @@ internal static class ThumbnailEndpoints
             .WithName("GetCreatorThumbnail")
             .WithSummary("Get thumbnail for a creator")
             .WithDescription("Retrieves the thumbnail image for a creator by their ID")
-            .Produces(200, contentType:"image/jpeg")
-            .Produces(200, contentType:"image/png")
+            .WithTags("Thumbnail Retrieval")
+            .Produces(200, contentType: "image/jpeg")
+            .Produces(200, contentType: "image/png")
             .Produces(404);
 
+        // Get music track thumbnail endpoint - retrieves thumbnail for a music track (GET /thumbnails/music-track/{id})
         thumbnailGroup.MapGet("/music-track/{id:long}",
                 async (long id, IMediator sender, CancellationToken cancellationToken) =>
                 {
@@ -51,9 +56,12 @@ internal static class ThumbnailEndpoints
             .WithName("GetMusicTrackThumbnail")
             .WithSummary("Get thumbnail for a music track")
             .WithDescription("Retrieves the thumbnail image for a music track by its ID")
-            .Produces(200, contentType:"image/jpeg")
-            .Produces(200, contentType:"image/png")
+            .WithTags("Thumbnail Retrieval")
+            .Produces(200, contentType: "image/jpeg")
+            .Produces(200, contentType: "image/png")
             .Produces(404);
+
+        #endregion
 
         return endpoints;
     }

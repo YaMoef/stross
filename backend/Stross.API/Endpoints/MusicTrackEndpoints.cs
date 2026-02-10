@@ -8,8 +8,12 @@ internal static class MusicTrackEndpoints
 {
     internal static IEndpointRouteBuilder MapMusicTrackEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGroup("/music-tracks")
-            .MapPost("download",
+        RouteGroupBuilder musicTrackGroup = endpoints.MapGroup("/music-tracks");
+
+        #region Music Track Management
+
+        // Download music track endpoint - downloads a music track from a provider (POST /music-tracks/download)
+        musicTrackGroup.MapPost("download",
                 async (DownloadMusicTrackInput input, IMediator sender, CancellationToken cancellationToken) =>
                 {
                     DownloadMusicTrackCommand command = new DownloadMusicTrackCommand(input);
@@ -17,7 +21,12 @@ internal static class MusicTrackEndpoints
                     long result = await sender.Send(command, cancellationToken);
 
                     return Results.Ok(result);
-                });
+                })
+            .WithName("DownloadMusicTrack")
+            .WithSummary("Download a music track from a provider")
+            .WithTags("Music Track Management");
+
+        #endregion
 
         return endpoints;
     }
