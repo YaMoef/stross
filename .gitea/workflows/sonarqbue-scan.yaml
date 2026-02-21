@@ -1,0 +1,60 @@
+name: Run sonarqube scan
+
+on:
+  push:
+    branches:
+      - dev
+      - acc
+      - main
+  pull_request:
+      types: [opened, synchronize, reopened]
+
+jobs:
+  run-sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Use Dotnet SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ./backend/global.json
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Restore NuGet packages
+        shell: bash
+        working-directory: backend
+        run: dotnet restore ${{ github.workspace }}/${{ vars.SONARQUBE_SOLUTION_FILE }}
+
+      - name: Install dotnet-sonarscanner
+        shell: bash
+        working-directory: backend
+        run: dotnet tool install --global dotnet-sonarscanner --version ${{ vars.SONARQUBE_SCANNER_VERSION }}
+
+      - name: Show sonarqube vars
+        shell: bash
+        run: |
+          echo ${{ github.event.number }}
+          echo ${{ steps.extract_branch.outputs.branch }}
+          echo ${{ github.event.number }}
+          echo ${{ github.head_ref }}
+          echo ${{ github.base_ref }}
+
+      - name: Run sonarscanner
+        shell: bash
+        working-directory: backend
+        run: |
+          if [ -z "${{ github.event.number }}" ]; then
+            ~/.dotnet/tools/dotnet-sonarscanner begin /k:${{ vars.SONARQUBE_KEY }} /d:sonar.token=${{ secrets.SONARQUBE_GLOBAL_ANALYSIS_TOKEN }} /d:sonar.verbose=false /d:sonar.host.url=${{ vars.SONARQUBE_HOST_URL }} /d:sonar.branch.name=${{ steps.extract_branch.outputs.branch }} /d:sonar.cs.vscoveragexml.reportsPaths=${{ github.workspace }}/TestResults/sonar.coverage.xml
+          else
+            ~/.dotnet/tools/dotnet-sonarscanner begin /k:${{ vars.SONARQUBE_KEY }} /d:sonar.token=${{ secrets.SONARQUBE_GLOBAL_ANALYSIS_TOKEN }} /d:sonar.verbose=false /d:sonar.host.url=${{ vars.SONARQUBE_HOST_URL }} /d:sonar.pullrequest.key=PR-${{ github.event.number }} /d:sonar.pullrequest.branch=${{ github.head_ref }} /d:sonar.pullrequest.base=${{ github.base_ref }} /d:sonar.cs.vscoveragexml.reportsPaths=${{ github.workspace }}/TestResults/sonar.coverage.xml
+          fi
+          dotnet build ${{ github.workspace }}/${{ vars.SONARQUBE_SOLUTION_FILE }}
+          ~/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token=${{ secrets.SONARQUBE_GLOBAL_ANALYSIS_TOKEN }}
